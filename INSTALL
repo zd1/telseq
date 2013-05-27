@@ -1,0 +1,24 @@
+
+Building and installing TelSeq
++++++++++++++++++++++++++++++
+
+:Authors: Zhihao Ding <zd1@sanger.ac.uk>
+
+.. Contents::
+
+PREREQUISITES
+=============
+
+Building TelSeq requires the following software installed:
+
+Python__ 2.6.x or newer.
+
+Python__ http://www.python.org
+
+	
+INSTALLATION
+=============
+
+Download package from git repository.
+
+python setup.py install
