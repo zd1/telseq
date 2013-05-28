@@ -1,15 +1,6 @@
-TelSeq is ....
-
-This package contains:
-
-	* a
-	* b
-
-After installation, tests can be run with:
-
-python -c 'import telseq; telseq.test()'
+TelSeq is a software that estimates telomere length from 
+whole genome sequencing data (BAMs). 
 
 The most current development version is always available from our
 git repository:
-
-gitrepository
+git://github.com/zd1/telseq.git

@@ -2,10 +2,6 @@
 Building and installing TelSeq
 +++++++++++++++++++++++++++++
 
-:Authors: Zhihao Ding <zd1@sanger.ac.uk>
-
-.. Contents::
-
 PREREQUISITES
 =============
 
@@ -22,3 +18,4 @@ INSTALLATION
 Download package from git repository.
 
 python setup.py install
+
