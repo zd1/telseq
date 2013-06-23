@@ -18,4 +18,3 @@ INSTALLATION
 Download package from git repository.
 
 python setup.py install
-

@@ -40,7 +40,6 @@ def dna_complement(dna, reverse=False):
 def gc_fraction(dna):
     return len(re.findall('[GCgc]', dna))*1.0/len(dna)
     
-
 def flagresolve(flagnumber):
     
     flagnumber = int(flagnumber)
@@ -54,7 +53,8 @@ def flagresolve(flagnumber):
             0x40: "the first segment in the template",
             0x80: "the last segment in the template",
             0x100: "secondary alignment",
-            0x200: "not passing quality controls 0x400 PCR or optical duplicate"
+            0x200: "not passing quality controls", 
+            0x400: "PCR or optical duplicate"
     }
     
     setflags = {}

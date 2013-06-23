@@ -22,13 +22,25 @@ __all__ = ['TelomereLength']
 class SeqPattern():
         
     telomere_pattern = "TTAGGG"
-    nullvalsymbol="NA"
-    gc_interval=2
+    gc_interval=[0.48,0.52]
+    gc_binsize=0.06
+    cutoff = 7
+    readlength = 100
+    max_count = readlength/6
+    lengthatgc =  1097938400
     
-    def __init__(self, outdir, name, bamfile=None):
+    def __init__(self, outdir, name, bamfile=None, experimental=False):
         
         self.patterns = [self.telomere_pattern]
-        self.patterns.extend(self._tel_perm_letter())
+        
+        if experimental:
+            self.patterns.extend(self._tel_perm_letter())
+            self.gc_interval[0.40,0.60]
+            self.gc_binsize=0.02
+        else:
+            self.gc_interval=[0.48,0.52]
+            self.gc_binsize=0.06
+        
         self.patterns = set(self.patterns)
         
         self.bamfile=bamfile
@@ -41,19 +53,20 @@ class SeqPattern():
             "gc":{}, # reads at in gc range
             "ptn":{}, # telomeric read counts for reads with different amount of patterns
         }
-    
+        
         for ptn in self.patterns:
             self.bamproperty['ptn'][ptn]={}
         
         self.outdir=outdir
+        if not os.path.exists(os.path.join(outdir,'tmp')):
+             os.makedirs(os.path.join(outdir,'tmp'))
         self.name=name
         
     def bamparser(self):
         
         # only extract flag, chromsome name, position, and the actual read
         samfields = "2,3,4,10"        
-#         p1 = subprocess.Popen(["samtools","view", self.bamfile], stdout=subprocess.PIPE )
-        p1 = subprocess.Popen(["cat", self.bamfile], stdout=subprocess.PIPE )
+        p1 = subprocess.Popen(["samtools","view", self.bamfile], stdout=subprocess.PIPE )
         p2= subprocess.Popen(["cut","-f%s"%samfields],stdin=p1.stdout, stdout=subprocess.PIPE )
         
         while (p2.poll() == None):
@@ -69,40 +82,48 @@ class SeqPattern():
                     self.bamproperty['map'] +=1
                 if setflags.has_key(0x400): # 0x400 for pcr duplicates
                     self.bamproperty['dup'] +=1
-                    
+                
                 gcfraction = util.gc_fraction(read)
-                gcbin=int(gcfraction*100/self.gc_interval) # count read by its GC to every 2% GC bin
-                
-                if not self.bamproperty['gc'].has_key(gcbin):
-                    self.bamproperty['gc'][gcbin]=1
-                else:
-                    self.bamproperty['gc'][gcbin]+=1
-                
+                if gcfraction >= self.gc_interval[0] and gcfraction <= self.gc_interval[1]:
+                    gcbin=int(gcfraction*1.0/self.gc_binsize) # count read by its GC to every gc_binsize % GC bin
+                    if not self.bamproperty['gc'].has_key(gcbin):
+                        self.bamproperty['gc'][gcbin]=1
+                    else:
+                        self.bamproperty['gc'][gcbin]+=1
+                        
                 for ptn in self.patterns:
                     target_count = self._countpattern(ptn, read)
                     if not self.bamproperty['ptn'][ptn].has_key(target_count):
                         self.bamproperty['ptn'][ptn][target_count] =1
                     else:
                         self.bamproperty['ptn'][ptn][target_count] +=1
-                    
-        util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
+        
+        util.cdm(self.bamproperty,os.path.join(self.outdir,'tmp', "%s.bamscan.pickle"%self.name ))
+#         util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
         
     @classmethod    
-    def integrate(self, outdir):
+    def integrate(cls, outdir, atComplete, nbams, experimental=False):
+        
+        nullvalsymbol="0"
         
         data={}
         dummy_name=0
-        resultfiles = glob.glob("%s/*.bamscan.pickle"%outdir)
+        resultfiles = glob.glob(os.path.join(outdir,'tmp',"*.bamscan.pickle"))
+        
         if len(resultfiles) == 0:
             print >> sys.stderr, "No result files found in \n %s"%outdir
             sys.exit(1)
-            
+        
+        if atComplete:
+            if not len(resultfiles) == nbams:
+                print "BAMs specified hasn't all been analysed yet."
+                sys.exit(0)
+        
         for pkl in resultfiles:
             result = util.cl(pkl)
-#             data[result['name']]=result
             data[dummy_name]=result
             dummy_name +=1
-            
+        
         gc = [data[smp]["gc"] for smp in data.keys()]
         gclist = [val for subl in gc for val in subl]
         gc_range=[min(gclist),max(gclist)]
@@ -121,10 +142,18 @@ class SeqPattern():
         ptn_result_order = [p for p in ptnlist]
         
         header = ["Name","TotalReadCount","MappedReadCount", "DuplicateReadCount"]
-        header.extend(["GC%d_%d"%(g*2,g*2+2) for g in range(gc_range[0],gc_range[1]+1)])
+        if experimental:
+            header.extend(["GC_%d"%(g) for g in range(gc_range[0],gc_range[1]+1)])
+        else:
+            header.extend(["GC_%d_%d"%(SeqPattern.gc_interval[0]*100, SeqPattern.gc_interval[1]*100)])
         
         for pt in ptn_result_order:
-            header.extend(["%s_%d"%(pt,g) for g in range(ptn_cnt_range[0],ptn_cnt_range[1]+1)])
+            if experimental:
+                header.extend(["%s_%d"%(pt,g) for g in range(ptn_cnt_range[0],ptn_cnt_range[1]+1)])
+            else:
+                header.extend(["TTAGGG_%s+"%SeqPattern.cutoff])
+        
+        header.append("lengthEstimate")
         
         outarray=[]
         outarray.append(header)
@@ -141,18 +170,28 @@ class SeqPattern():
                 if data[sample]['gc'].has_key(gc):
                     outrow.append(data[sample]['gc'][gc])
                 else:
-                    outrow.append(self.nullvalsymbol)
+                    outrow.append(nullvalsymbol)
             for ptn in ptn_result_order:
-                for ptn_cnt in range(ptn_cnt_range[0],ptn_cnt_range[1]+1):
-                    if data[sample]['ptn'][ptn].has_key(ptn_cnt):
-                        outrow.append(data[sample]['ptn'][ptn][ptn_cnt])
-                    else:
-                        outrow.append(self.nullvalsymbol)
+                if experimental:
+                    for ptn_cnt in range(ptn_cnt_range[0],ptn_cnt_range[1]+1):
+                        if data[sample]['ptn'][ptn].has_key(ptn_cnt):
+                            outrow.append(data[sample]['ptn'][ptn][ptn_cnt])
+                        else:
+                            outrow.append(nullvalsymbol)
+                else:
+                    acc = 0
+                    for ptn_cnt in range(SeqPattern.cutoff, SeqPattern.max_count):
+                        if data[sample]['ptn'][ptn].has_key(ptn_cnt):
+                            acc += data[sample]['ptn'][ptn][ptn_cnt]
+                    outrow.append(acc)
+                    tl = (acc*1.0/data[sample]['gc'][gc_range[0]])*SeqPattern.lengthatgc*1.0/46000
+                    outrow.append(tl)
+            
             outarray.append(outrow)
             
         transposed_outarray = zip(*outarray)
-        util.cdm(transposed_outarray, "%s/sum_table.pickle"%outdir)
-        ofh = file("%s/sum_table.csv"%outdir,'wb')
+        util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table.pickle"))
+        ofh = file( os.path.join(outdir,"sum_table.csv"),'wb')
         for row in transposed_outarray:
             ofh.write(','.join([str(s) for s in row])+"\n")
         ofh.close()
