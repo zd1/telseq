@@ -28,11 +28,7 @@ LOG_LEVELS = {'debug': LG.DEBUG,
 
 VERSION="0.0.1"
 
-def now():
-    timeformat="%Y%m%d_%H%M%S"
-    return datetime.strftime(datetime.now(), timeformat)
-
-def getbams(bamindex):
+def _getbams(bamindex):
     
     ofh = file(bamindex, 'rb')
     userautoID=False
@@ -41,29 +37,29 @@ def getbams(bamindex):
     sid = 0
     for line in ofh:
         thisline = line.strip().split()
-        if len(thisline)==1:
-            userautoID = True
+        if len(thisline)==1 and not userautoID: # found only 1 col
+            userautoID = True # switch to auto id
             LG.warn(("No ID specified for bam %s \n"
             "Use serial number generated automatically as IDs" 
             "")%(line.strip()))
+        bamfile=None
         if userautoID:
             sid += 1
             allids.append(sid)
+            bamfile=thisline[0]
         else:
             allids.append(thisline[0])
-            
-        if re.search("bam$", thisline[1]):
-            bams.append(thisline[1])
-        else:
-            print >> sys.stderr, "It seems that the BAM files provided in the list file, \ni.e. %s \ndoes not have a .bam suffix." % (thisbam)
-            sys.exit(1)
+            bamfile=thisline[1]
+
+        bams.append(_check_bam(bamfile))
+        
     ofh.close()
     assert len(bams) != 0, "Can't get bam file paths from the file specified"
     assert len(allids) != 0, "Can't get bam ID from the file specified"
     assert len(bams) == len(allids), "The number of IDs and the number of BAMs do not match"
     return allids, bams
 
-def check_required_sotware(f):
+def _check_required_sotware(f):
     for path in os.environ['PATH'].split(os.pathsep):
         if not os.path.exists(path):
             continue
@@ -72,13 +68,20 @@ def check_required_sotware(f):
                 return os.path.join(path,f)
     return False
     
+def _check_bam(bamfile):
+    if re.search("bam$", bamfile):
+        return bamfile
+    else:
+        print >> sys.stderr, "It seems that the BAM files provided in the list file, \ni.e. %s \ndoes not have a .bam suffix." % (thisbam)
+        sys.exit(1)
+
 def main(argv):
     
     print "================================================"
     print "======= Telseq v%s " %VERSION
     print "================================================"
     
-    if not check_required_sotware('samtools'):
+    if not _check_required_sotware('samtools'):
         print "Required software \"samtools\" can not be found in the paths specified in the environment PATH variable"
         sys.exit(1)
     
@@ -110,96 +113,99 @@ def main(argv):
     
     (options, args) = parser.parse_args(argv)
     
-    outdir = options.output_directory
-    if outdir== default_outputdir:
-        LG.warn("Output directory is not specified (by the -o option), use the current"
-                "directory as the output directory.")
-    
-    # if runs have already completed, only applicable to the cases of analysing multiple BAMs, 
-    # and user wants to merge all the results. 
-    if options.mg == True:
-        if options.bams != None:
-            ids, bams = getbams(options.bams)
-            telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=len(bams))
-            print "\tCommand:run.py %s"%(" ".join(argv))
-            print "\tMerging result files "
-        
-        sys.exit(0)
-    
-    # In the case of only a single BAM is specified, check if it's there
-    if len(args)==0 and options.bams == None:
-        print "\n"
-        print "ERROR: no bam file has been specified \n\n"
-        parser.print_help()
-        sys.exit()
-    
     if options.level != None and options.level in LOG_LEVELS.keys():
         LEVEL = LOG_LEVELS.get(options.level, LG.NOTSET)
         FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
         LG.basicConfig(level=LEVEL,format=FORMAT)
         
-    bams = []
-    ids = []
-    index=None
+    outdir = options.output_directory
+    if outdir== default_outputdir: 
+        LG.warn("Output directory is not specified (by the -o option), use the current"
+                "directory as the output directory.")
     
-    # In the case of multiple bams are specified in a text file, the bam index file, 
-    # load all of them in. 
-    if options.bams != None:
-        if options.mg :
-            telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=len(bams))    
-            sys.exit(0)
-        ids, bams = getbams(options.bams)
-        
-        if options.index != None:
-            assert options.index >=1 and options.index <= len(bams), "index provided is not valid. It has to be within range [%d, %d]"%(1,len(bams)) 
-            index=options.index -1 # convert to be 0-based
-    else:
-        bams=[args[0]]
-        if options.bamid != None:
-            ids = [options.bamid]
-        else:
-            ids= 1
+    experimental = True
+    outputindresults = True
     
-
+    
     print "\tCommand:run.py %s"%(" ".join(argv))
-    print "\tNumber oF BAMs specified:%d"%(len(bams))
+
+    mode = None
+    if len(args)==1 and options.bams is None:
+        # this is single bam mode
+        mode = 1
+        if options.bamid is None:
+            print "Please specified a name using --name for the BAM \n"
+            sys.exit(0)
+        
+    if len(args)==0 and options.bams is not None and options.index is None:
+        # this is multi bam mode, running through all sequentially
+        mode = 2
+        
+    if len(args)==0 and options.bams is not None and options.index is not None:
+        # this is multi bam mode, running only for one sample specified by the index
+        mode = 3
     
-    if options.bams == None or (options.bams != None and index != None): # we only analyse one BAM
-        if index != None:
-            bam = bams[index]
-            id = ids[index]
-            print ("\tAnalysing BAM %s with name %s"%(bam,id))
-            print ("\tIt's the %d th BAM in the BAM list specified"%(index+1))
-        else:
-            bam = bams[0]
-            id = ids[0]
-            print ("\tAnalysing BAM %s with name %s"%(bam,id))
-            
-        if not os.path.exists(bam):
-            print "\n"
-            print "ERROR: Can't find BAM file\n%s\n"%bam
-            sys.exit()
-            
+    if len(args)==0 and options.mg and options.bams is not None:
+        # merge the resulting files
+        mode = 4
+        
+    if mode is None:
+        LG.warn("Usage not recognised.")
+        parser.print_help()
+        sys.exit(0)
+    
+    
+    if mode == 1:
+        bam= _check_bam(args[0])
+        id = options.bamid
+        print ("\tAnalysing BAM %s with name %s"%(bam,id))
         ts = telseq.core.SeqPattern(
                     outdir=outdir,
                     name=id,
-                    bamfile=bam)
+                    bamfile=bam, 
+                    experimental=experimental)
         ts.bamparser()
-        telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=1)
-        
-    else:
+        telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=1, id=id, experimental=experimental)
+    
+    if mode == 2:
+        ids, bams = _getbams(options.bams)
+        print "\tNumber oF BAMs specified:%d"%(len(bams))
         for i in range(len(bams)):
             bam=bams[i]
             id=ids[i]
             ts = telseq.core.SeqPattern(
                     outdir=outdir,
                     name=id,
-                    bamfile=bam)
+                    bamfile=bam,
+                    experimental=experimental)
             ts.bamparser()
-
-
-
-
+            if outputindresults:
+                telseq.core.SeqPattern.integrate(outdir, atComplete=False,nbams=1, id=id, experimental=experimental)
+        telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=len(bams), experimental=experimental)
+        
+    if mode == 3:
+        ids, bams = _getbams(options.bams)
+        print "\tNumber oF BAMs specified:%d"%(len(bams))
+        assert options.index >= 1 and options.index <= len(bams), "Index specified out of range"
+        idx = options.index -1
+        id = ids[idx]
+        bam = bams[idx]
+        print ("\tAnalysing BAM %s with name %s"%(bam,id))
+        ts = telseq.core.SeqPattern(
+                    outdir=outdir,
+                    name=id,
+                    bamfile=bam, 
+                    experimental=experimental)
+        ts.bamparser()
+        if outputindresults:
+            telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=1, id=id, experimental=experimental)
+        
+    if mode == 4:
+        ids, bams = _getbams(options.bams)
+        print "\tNumber oF BAMs to be merged:%d"%(len(bams))
+        telseq.core.SeqPattern.integrate(outdir, atComplete=True, nbams=len(bams), experimental=experimental)
+            
+    
 if __name__ == "__main__":
     main(argv=sys.argv[1:])
     

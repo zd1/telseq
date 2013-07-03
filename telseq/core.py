@@ -17,7 +17,7 @@ import glob
 import util
 import pdb
     
-__all__ = ['TelomereLength']
+__all__ = ['SeqPattern']
 
 class SeqPattern():
         
@@ -34,8 +34,8 @@ class SeqPattern():
         self.patterns = [self.telomere_pattern]
         
         if experimental:
-            self.patterns.extend(self._tel_perm_letter())
-            self.gc_interval[0.40,0.60]
+#             self.patterns.extend(self._tel_perm_letter()) 
+            self.gc_interval=[0.40,0.60]
             self.gc_binsize=0.02
         else:
             self.gc_interval=[0.48,0.52]
@@ -102,21 +102,49 @@ class SeqPattern():
 #         util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
         
     @classmethod    
-    def integrate(cls, outdir, atComplete, nbams, experimental=False):
+    def integrate(cls, outdir, atComplete, nbams, id=None, experimental=False, bams=None):
         
         nullvalsymbol="0"
+        if nbams == 1:
+            assert id is not None
+            resultfiles = glob.glob(os.path.join(outdir,'tmp',"%s.bamscan.pickle"%(id)))
+        else:
+            resultfiles = glob.glob(os.path.join(outdir,'tmp',"*.bamscan.pickle"))
         
         data={}
         dummy_name=0
-        resultfiles = glob.glob(os.path.join(outdir,'tmp',"*.bamscan.pickle"))
+        
         
         if len(resultfiles) == 0:
             print >> sys.stderr, "No result files found in \n %s"%outdir
             sys.exit(1)
         
         if atComplete:
-            if not len(resultfiles) == nbams:
+            if  len(resultfiles) < nbams:
                 print "BAMs specified hasn't all been analysed yet."
+                print "Found these %d bams"(len(resultfiles))
+                print resultfiles
+                print "Specified %d bams in the index file"%(nbams)
+                
+                if bams is not None:
+                    res = set( [os.path.basename(rf) for rf in resultfiles])
+                    bms = set([os.path.basename(bf) for bf in bams])
+                    print "Found unfinished bams "
+                    print bms - res
+                
+                sys.exit(0)
+            
+            if  len(resultfiles) > nbams:
+                print "Found more result files than that specified in the bam index file."
+                print "%d bams specified"%(nbams)
+                print "%d result files found"%(len(resultfiles))
+                
+                if bams is not None:
+                    res = set( [os.path.basename(rf) for rf in resultfiles])
+                    bms = set([os.path.basename(bf) for bf in bams])
+                    print "Found extra files "
+                    print res - bms
+                    
                 sys.exit(0)
         
         for pkl in resultfiles:
@@ -143,7 +171,7 @@ class SeqPattern():
         
         header = ["Name","TotalReadCount","MappedReadCount", "DuplicateReadCount"]
         if experimental:
-            header.extend(["GC_%d"%(g) for g in range(gc_range[0],gc_range[1]+1)])
+             header.extend(["GC_%d"%(g) for g in range(gc_range[0],gc_range[1]+1)])
         else:
             header.extend(["GC_%d_%d"%(SeqPattern.gc_interval[0]*100, SeqPattern.gc_interval[1]*100)])
         
@@ -190,8 +218,12 @@ class SeqPattern():
             outarray.append(outrow)
             
         transposed_outarray = zip(*outarray)
-        util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table.pickle"))
-        ofh = file( os.path.join(outdir,"sum_table.csv"),'wb')
+        tab=""
+        if nbams == 1 and id is not None:
+            tab="_%s"%id
+        
+        util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table%s.pickle"%tab))
+        ofh = file( os.path.join(outdir,"sum_table%s.csv"%tab),'wb')
         for row in transposed_outarray:
             ofh.write(','.join([str(s) for s in row])+"\n")
         ofh.close()
