@@ -9,22 +9,23 @@ git://github.com/zd1/telseq.git
 EXAMPLE USAGE
 ============================
 
-# Single BAM analysis
+Analysing a single BAM
 ---------------------------------
-python run.py --name mysample1 -o tests/ tests/test.1.bam
-
-# Multi BAM analysis
+python run.py --name mysample1 --output-dir tests/ tests/test.1.bam
+ 
+Analysing a list of BAMs 
 ---------------------------------
-# For a list of BAM files that are listed in a text file, i.e. bamindex
-# TelSeq can be run in the following two ways:
-# 1. They can be run sequentially (may take a very long time)
-python run.py --bams tests/bamindex -o tests/
+In this mode, paths of the BAMs should listed in a text file, i.e. 
+named bamlist in the following examples
+TelSeq can be run in the following two ways:
+(1). Analyse BAMs sequentially (may take a very long time)
+python run.py --bams tests/bamlist --output-dir tests/
+ 
+(2). Analyse BAMs in parallel, i.e. on a computing cluster. Each run 
+requires an index number, ranging from 1 to the total number of BAMs, 
+indicating which BAM in the bamlist to be analysed. 
+# To analyse the 1st BAM in the bamlist tests/bamlist
+python run.py --index 1  --bams tests/bamlist --output-dir tests/
 
-# 2. They can also be run in parallelly, with a index number (from 1 to 
-# the total number of BAMs)
-python run.py --index 1  --bams tests/bamindex -o tests/
-
-# After the above run has finished, output from each run can be merged by 
-# the following command
-python run.py --merge --bams tests/bamindex -o tests/
-
+# And don't forget to merge them after all runs are completed. 
+python run.py --merge --bams tests/bamlist --output-dir tests/

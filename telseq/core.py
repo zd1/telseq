@@ -102,7 +102,7 @@ class SeqPattern():
 #         util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
         
     @classmethod    
-    def integrate(cls, outdir, atComplete, nbams, id=None, experimental=False, bams=None):
+    def integrate(cls, outdir, atComplete, nbams, id=None, experimental=False, bams=None, minimum=True):
         
         nullvalsymbol="0"
         if nbams == 1:
@@ -113,7 +113,6 @@ class SeqPattern():
         
         data={}
         dummy_name=0
-        
         
         if len(resultfiles) == 0:
             print >> sys.stderr, "No result files found in \n %s"%outdir
@@ -223,7 +222,11 @@ class SeqPattern():
             tab="_%s"%id
         
         util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table%s.pickle"%tab))
-        ofh = file( os.path.join(outdir,"sum_table%s.csv"%tab),'wb')
+        if minimum:
+            transposed_outarray = [transposed_outarray[0],transposed_outarray[-1]]
+        
+        ofh = file(os.path.join(outdir,"sum_table%s.csv"%tab),'wb')
+        
         for row in transposed_outarray:
             ofh.write(','.join([str(s) for s in row])+"\n")
         ofh.close()
