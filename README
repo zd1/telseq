@@ -8,6 +8,8 @@ git://github.com/zd1/telseq.git
 
 EXAMPLE USAGE
 ============================
+The software can be run straightaway after download as a command line 
+tool. 
 
 Analysing a single BAM
 ---------------------------------
