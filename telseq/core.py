@@ -102,49 +102,13 @@ class SeqPattern():
 #         util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
         
     @classmethod    
-    def integrate(cls, outdir, atComplete, nbams, id=None, experimental=False, bams=None, minimum=True):
+    def integrate(cls, outdir, ids, experimental=False, bams=None, minimum=True):
         
         nullvalsymbol="0"
-        if nbams == 1:
-            assert id is not None
-            resultfiles = glob.glob(os.path.join(outdir,'tmp',"%s.bamscan.pickle"%(id)))
-        else:
-            resultfiles = glob.glob(os.path.join(outdir,'tmp',"*.bamscan.pickle"))
+        resultfiles = [os.path.join(outdir,'tmp',"%s.bamscan.pickle"%(i)) for i in ids]
         
         data={}
         dummy_name=0
-        
-        if len(resultfiles) == 0:
-            print >> sys.stderr, "No result files found in \n %s"%outdir
-            sys.exit(1)
-        
-        if atComplete:
-            if  len(resultfiles) < nbams:
-                print "BAMs specified hasn't all been analysed yet."
-                print "Found these %d bams"(len(resultfiles))
-                print resultfiles
-                print "Specified %d bams in the index file"%(nbams)
-                
-                if bams is not None:
-                    res = set( [os.path.basename(rf) for rf in resultfiles])
-                    bms = set([os.path.basename(bf) for bf in bams])
-                    print "Found unfinished bams "
-                    print bms - res
-                
-                sys.exit(0)
-            
-            if  len(resultfiles) > nbams:
-                print "Found more result files than that specified in the bam index file."
-                print "%d bams specified"%(nbams)
-                print "%d result files found"%(len(resultfiles))
-                
-                if bams is not None:
-                    res = set( [os.path.basename(rf) for rf in resultfiles])
-                    bms = set([os.path.basename(bf) for bf in bams])
-                    print "Found extra files "
-                    print res - bms
-                    
-                sys.exit(0)
         
         for pkl in resultfiles:
             result = util.cl(pkl)
@@ -218,8 +182,8 @@ class SeqPattern():
             
         transposed_outarray = zip(*outarray)
         tab=""
-        if nbams == 1 and id is not None:
-            tab="_%s"%id
+        if len(ids) == 1:
+            tab="_%s"%ids[0]
         
         util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table%s.pickle"%tab))
         if minimum:
