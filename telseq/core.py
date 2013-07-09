@@ -69,6 +69,8 @@ class SeqPattern():
         p1 = subprocess.Popen(["samtools","view", self.bamfile], stdout=subprocess.PIPE )
         p2= subprocess.Popen(["cut","-f%s"%samfields],stdin=p1.stdout, stdout=subprocess.PIPE )
         
+        counter = 0
+        pct = 0.1
         while (p2.poll() == None):
             if p2.stdout == None: break
             for line in p2.stdout:
@@ -97,9 +99,15 @@ class SeqPattern():
                         self.bamproperty['ptn'][ptn][target_count] =1
                     else:
                         self.bamproperty['ptn'][ptn][target_count] +=1
-        
+                
+                if counter%10==0:
+                    pct =  pct+0.1 if pct+0.1<1 else 0.1
+                    util.update_progress(pct, readcount=counter, showpct=False)
+                counter += 1
+                
         util.cdm(self.bamproperty,os.path.join(self.outdir,'tmp', "%s.bamscan.pickle"%self.name ))
 #         util.cdm(self.bamproperty,"%s/%s.bamscan.pickle"%(self.outdir,self.name))
+        util.update_progress(1, readcount=counter, showpct=False)
         
     @classmethod    
     def integrate(cls, outdir, ids, experimental=False, bams=None, minimum=True):

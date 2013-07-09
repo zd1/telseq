@@ -11,6 +11,7 @@ Created on 26 May 2013
 
 import re
 import cPickle
+import sys
 
 def cl(f): 
     return cPickle.load(open(f,'rb'))
@@ -64,4 +65,29 @@ def flagresolve(flagnumber):
     
     return setflags
             
-
+def update_progress(progress, readcount, showpct=False):
+    
+    barLength = 30 
+    status = "scanned %d reads"%readcount
+    if isinstance(progress, int):
+        progress = float(progress)
+    if not isinstance(progress, float):
+        progress = 0
+        status = "error: progress var must be float\r\n"
+    if progress < 0:
+        progress = 0
+        status = "Halt...\r\n"
+    if progress >= 1:
+        progress = 1
+        status = "\r\n"
+    block = int(round(barLength*progress))
+    if showpct:
+        text = "\rPercent: [{0}] {1}% {2}".format( "#"*block + "-"*(barLength-block), progress*100, status)
+    else:
+        text = "\rProgress: [{0}] {1}".format( "#"*block + "-"*(barLength-block), status)
+        
+    sys.stdout.write(text)
+    sys.stdout.flush()
+    
+    
+    
