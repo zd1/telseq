@@ -100,7 +100,7 @@ class SeqPattern():
                     else:
                         self.bamproperty['ptn'][ptn][target_count] +=1
                 
-                if counter%10==0:
+                if counter%100000==0:
                     pct =  pct+0.1 if pct+0.1<1 else 0.1
                     util.update_progress(pct, readcount=counter, showpct=False)
                 counter += 1
@@ -152,6 +152,7 @@ class SeqPattern():
             else:
                 header.extend(["TTAGGG_%s+"%SeqPattern.cutoff])
         
+        header.append("accumulatedCount")
         header.append("lengthEstimate")
         
         outarray=[]
@@ -177,6 +178,13 @@ class SeqPattern():
                             outrow.append(data[sample]['ptn'][ptn][ptn_cnt])
                         else:
                             outrow.append(nullvalsymbol)
+                    acc = 0
+                    for ptn_cnt in range(SeqPattern.cutoff, SeqPattern.max_count):
+                        if data[sample]['ptn'][ptn].has_key(ptn_cnt):
+                            acc += data[sample]['ptn'][ptn][ptn_cnt]
+                    outrow.append(acc)
+                    tl = (acc*1.0/data[sample]['gc'][gc_range[0]])*SeqPattern.lengthatgc*1.0/46000
+                    outrow.append(tl)
                 else:
                     acc = 0
                     for ptn_cnt in range(SeqPattern.cutoff, SeqPattern.max_count):
@@ -185,23 +193,24 @@ class SeqPattern():
                     outrow.append(acc)
                     tl = (acc*1.0/data[sample]['gc'][gc_range[0]])*SeqPattern.lengthatgc*1.0/46000
                     outrow.append(tl)
-            
             outarray.append(outrow)
-            
-        transposed_outarray = zip(*outarray)
+        
+       
         tab=""
         if len(ids) == 1:
             tab="_%s"%ids[0]
         
-        util.cdm(transposed_outarray, os.path.join(outdir,"tmp","sum_table%s.pickle"%tab))
+        util.cdm(outarray, os.path.join(outdir,"tmp","sum_table%s.pickle"%tab))
         if minimum:
+            transposed_outarray = zip(*outarray)
             transposed_outarray = [transposed_outarray[0],transposed_outarray[-1]]
+            outarray=zip(*transposed_outarray)
         
         ofh = file(os.path.join(outdir,"sum_table%s.csv"%tab),'wb')
-        
-        for row in transposed_outarray:
+        for row in outarray:
             ofh.write(','.join([str(s) for s in row])+"\n")
         ofh.close()
+        
         
     def _countpattern(self, ptn, dna):
         

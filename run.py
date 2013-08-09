@@ -157,10 +157,10 @@ def main():
                    help='Path for a single BAM file.')
     
     group = parser.add_argument_group('Experimental options')
-    group.add_argument("-e", "--experimental", action="store_true", dest="expr", default=False,
+    group.add_argument("-e", "--experimental", action="store_false", dest="expr", default=True,
                   help="Calculate varialbles that are useful for experimental purposes. ")
-    group.add_argument("-v", "--details", action="store_true", dest="det", default=False,
-                  help="Only output the telomere length.")
+    group.add_argument("-v", "--verbose", action="store_true", dest="verbose", default=False,
+                  help="Output details. Not set by default.")
     group.add_argument("-t", "--outputeach", action="store_true", dest="ot", default=False,
                   help="Output text table result for each run.")
     
@@ -173,7 +173,7 @@ def main():
         
     
     experimental_run = experimental = args.expr
-    minimum = not args.det
+    minimum = not args.verbose
     outputindresults = args.ot
     
     print "Command: %s \n"%(' '.join(sys.argv))
