@@ -16,6 +16,9 @@ import subprocess
 import glob
 import util
 import pdb
+import logging as LG
+LG.basicConfig(level=LG.INFO)
+
     
 __all__ = ['SeqPattern']
 
@@ -211,13 +214,68 @@ class SeqPattern():
             ofh.write(','.join([str(s) for s in row])+"\n")
         ofh.close()
         
-        
+    
     def _countpattern(self, ptn, dna):
         
         fw = len(re.findall(ptn,dna))
         rv = len(re.findall(util.dna_complement(ptn, reverse=True),dna))
         return fw if fw > rv else rv
+    
+    @classmethod    
+    def diagnosis_plots(self, outdir):
+
+        import cPickle
+        import matplotlib
+        matplotlib.use('PDF')
+        import pylab
+        import matplotlib.pylab as plt
+        from matplotlib.backends.backend_pdf import PdfPages
+        import numpy as np
+        
+        resultpickle = os.path.join(outdir,"tmp","sum_table.pickle")
+        if not os.path.exists(resultpickle):
+           LG.info("Can't find the merged result file. Maybe results haven't been produced or merged?")
+           LG.info("%s"%resultpickle)
+           sys.exit(1)
+        
+        data=cPickle.load(open(resultpickle,'rb'))
+        
+        data = np.array(data)
+        samples = data[1:,0]
+        ind=np.arange(len(samples))
+        headers = data[0,1:]
+        
+        pdf_pages = PdfPages(os.path.join(outdir,"diagnosis_plot.pdf"))
+        
+        cols=(['b','g','r','c','m','y']*10)[:len(headers)]
+        
+        for c in range(len(headers)):
             
+           if c==0 or c%2==0:
+               fig=plt.figure()
+           ax = plt.subplot(2,1,c%2+1)
+        
+           width = 0.8
+           vals = []
+           for v in data[1:,c+1]:
+               try:
+                   vals.append(float(v))
+               except:
+                   vals.append(0)
+        
+           ax.bar(ind, vals, width, label=headers[c], color=cols[c])
+           ax.set_ylabel('Signal')
+           ax.set_xticks(ind+width/2.)
+           ax.set_xticklabels(samples, rotation=90, fontsize=6)
+           ax.set_xlabel('Samples')
+           ax.legend()
+           if c!=0 and c%2 == 1:
+               pdf_pages.savefig(fig)
+        
+        pdf_pages.close() 
+    
+    
+    
     def _tel_perm_letter(self):
         return [
         "GTATGG",

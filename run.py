@@ -102,6 +102,11 @@ example usages:
     
     # And don't forget to merge them after all runs are completed. 
     python run.py --merge --bams tests/bamlist --output-dir tests/
+    
+    Generating simple plots
+    ---------------------------------
+    python run.py -plot --output-dir tests
+    
     '''
 
 
@@ -156,6 +161,9 @@ def main():
     parser.add_argument('bam', metavar='bamfile', type=str, nargs='?', default=None,
                    help='Path for a single BAM file.')
     
+    parser.add_argument("-plot", "--plot", action="store_true", dest="plot", default=False,
+                  help="Make diagnosis plots.")
+    
     group = parser.add_argument_group('Experimental options')
     group.add_argument("-e", "--experimental", action="store_false", dest="expr", default=True,
                   help="Calculate varialbles that are useful for experimental purposes. ")
@@ -202,6 +210,10 @@ def main():
         else:
             fg = [f for f in [0,1,2] if [args.mg,args.fm,args.vm][f] == True]
             mode = 4 + fg[0]
+    
+    if args.plot:
+        # do plot
+        mode = -1
         
     if mode is None:
         LG.error("Usage not recognised.\n")
@@ -272,6 +284,9 @@ def main():
         ids, bams = _getbams(args.bams)
         sids = _check_results(outdir,ids, force_bamlist=True)
         telseq.core.SeqPattern.integrate(outdir, ids = sids, experimental=experimental, minimum=minimum)
+    
+    if mode == -1:
+        telseq.core.SeqPattern.diagnosis_plots(outdir)
     
     print "Done. "
     
