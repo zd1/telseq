@@ -231,6 +231,7 @@ class SeqPattern():
         import matplotlib.pylab as plt
         from matplotlib.backends.backend_pdf import PdfPages
         import numpy as np
+        import re
         
         resultpickle = os.path.join(outdir,"tmp","sum_table.pickle")
         if not os.path.exists(resultpickle):
@@ -249,29 +250,38 @@ class SeqPattern():
         
         cols=(['b','g','r','c','m','y']*10)[:len(headers)]
         
+        lencol=re.compile("length")
         for c in range(len(headers)):
+            if lencol.search(headers[c]):
+                ylab='Kb'
+            else:
+                ylab='Read Count'
             
-           if c==0 or c%2==0:
-               fig=plt.figure()
-           ax = plt.subplot(2,1,c%2+1)
-        
-           width = 0.8
-           vals = []
-           for v in data[1:,c+1]:
-               try:
-                   vals.append(float(v))
-               except:
-                   vals.append(0)
-        
-           ax.bar(ind, vals, width, label=headers[c], color=cols[c])
-           ax.set_ylabel('Signal')
-           ax.set_xticks(ind+width/2.)
-           ax.set_xticklabels(samples, rotation=90, fontsize=6)
-           ax.set_xlabel('Samples')
-           ax.legend()
-           if c!=0 and c%2 == 1:
-               pdf_pages.savefig(fig)
-        
+            if c==0 or c%2==0:
+                fig=plt.figure(figsize=(8, 6), dpi=300)
+            ax = plt.subplot(2,1,c%2+1)
+            
+            width = 0.8
+            vals = []
+            for v in data[1:,c+1]:
+                try:
+                    vals.append(float(v))
+                except:
+                    vals.append(0)
+            
+            box = ax.get_position()
+            ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
+            
+            ax.bar(ind, vals, width, label=headers[c], color=cols[c])
+            ax.set_ylabel(ylab)
+            ax.set_xticks(ind+width/2.)
+            ax.set_xticklabels(samples, rotation=90, fontsize=6)
+            ax.set_xlabel('Samples')
+            ax.legend()
+            if c!=0 and c%2 == 1:
+                pdf_pages.savefig(fig)
+            
         pdf_pages.close() 
     
     
