@@ -17,7 +17,7 @@ python run.py --name mysample1 --output-dir tests/ tests/test.1.bam
  
 Analysing a list of BAMs 
 ---------------------------------
-In this mode, paths of the BAMs should listed in a text file, i.e. 
+In this mode, paths of the BAMs should be listed in a text file, i.e. 
 named bamlist in the following examples
 TelSeq can be run in the following two ways:
 (1). Analyse BAMs sequentially (may take a very long time)
