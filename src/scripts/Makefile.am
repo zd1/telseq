@@ -1,0 +1,1 @@
+bin_SCRIPTS = script1.sh 
