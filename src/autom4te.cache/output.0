@@ -626,10 +626,10 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
-AM_CXXFLAGS
 EGREP
 GREP
 CXXCPP
+AM_CXXFLAGS
 RANLIB
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
@@ -725,7 +725,6 @@ enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
 with_bamtools
-with_gzstream
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1365,8 +1364,6 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-bamtools=DIR     specify directory containing the bamtools library
                           (http://github.com/pezmaster31/bamtools)
-  --with-gzstream=DIR     specify directory containing the gzstream library
-                          (http://www.cs.unc.edu/Research/compgeom/gzstream/)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1736,52 +1733,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } @%:@ ac_fn_cxx_check_header_compile
-
-@%:@ ac_fn_cxx_try_link LINENO
-@%:@ -------------------------
-@%:@ Try to link conftest.@S|@ac_ext, and return whether this succeeded.
-ac_fn_cxx_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} @%:@ ac_fn_cxx_try_link
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -4271,6 +4222,45 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+
+@%:@ Check whether --with-bamtools was given.
+if test "${with_bamtools+set}" = set; then :
+  withval=$with_bamtools;  if test -d "$withval" ; then
+        	bamtools_include="-I$withval/include"
+			bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib"
+		else
+          	as_fn_error $? "Cannot stat directory $withval" "$LINENO" 5
+      	fi  
+        
+fi
+
+
+# Set compiler flags.
+AM_CXXFLAGS="-Wall -Wextra -Werror -Wno-unknown-pragmas"
+
+CXXFLAGS="-O3"
+
+CFLAGS="-O3"
+
+CPPFLAGS="$CPPFLAGS $bamtools_include $gzstream_include"
+
+LDFLAGS="$bamtools_ldflags $gzstream_ldflags $LDFLAGS"
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: \"CPPFLAGS is $CPPFLAGS\"" >&5
+$as_echo "$as_me: \"CPPFLAGS is $CPPFLAGS\"" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LDFLAGS is $LDFLAGS\"" >&5
+$as_echo "$as_me: \"LDFLAGS is $LDFLAGS\"" >&6;}
+
+# We always need to specify to link in bamtools
+LIBS="$LIBS -lbamtools"
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LIBS is $LIBS\"" >&5
+$as_echo "$as_me: \"LIBS is $LIBS\"" >&6;}
+
+# Make sure the bamtools headers can be found
+
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -4664,146 +4654,6 @@ fi
 done
 
 
-ac_fn_cxx_check_header_mongrel "$LINENO" "zlib.h" "ac_cv_header_zlib_h" "$ac_includes_default"
-if test "x$ac_cv_header_zlib_h" = xyes; then :
-  
-fi
-
-
- 
-# Checks for library functions.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing gzopen" >&5
-$as_echo_n "checking for library containing gzopen... " >&6; }
-if ${ac_cv_search_gzopen+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gzopen ();
-int
-main ()
-{
-return gzopen ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' z; do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_search_gzopen=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext
-  if ${ac_cv_search_gzopen+:} false; then :
-  break
-fi
-done
-if ${ac_cv_search_gzopen+:} false; then :
-  
-else
-  ac_cv_search_gzopen=no
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_gzopen" >&5
-$as_echo "$ac_cv_search_gzopen" >&6; }
-ac_res=$ac_cv_search_gzopen
-if test "$ac_res" != no; then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  
-else
-  as_fn_error $? "libz not found, please install zlib (http://www.zlib.net/)" "$LINENO" 5
-fi
-
-
-# Check for the bamtools library path
-# Bamtools has two different path formats
-# If it is built in place the files will be in {path}/lib/ and {path}/include/
-# If it is installed (with make install) it will be in {path}/include/bamtools
-# and {path}/lib/bamtools. Both variants are handled here
-
-#AC_ARG_WITH(bamtools, AS_HELP_STRING([--with-bamtools=PATH],
-#	[specify directory containing the bamtools library (http://github.com/pezmaster31/bamtools)])
-
-#if test -d "$with_bamtools"; then
-#    bamtools_ldflags="-Wl,-rpath,$with_bamtools/lib -L$with_bamtools/lib"
-#    bamtools_include="-I$with_bamtools/include"
-#fi
-
-
-@%:@ Check whether --with-bamtools was given.
-if test "${with_bamtools+set}" = set; then :
-  withval=$with_bamtools;  if test -d "$withval" ; then
-        	bamtools_include="-I$withval/include"
-			bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib"
-		else
-          	as_fn_error $? "Cannot stat directory $withval" "$LINENO" 5
-      	fi  
-        
-fi
-
-
-
-@%:@ Check whether --with-gzstream was given.
-if test "${with_gzstream+set}" = set; then :
-  withval=$with_gzstream;  if test -d "$withval" ; then
-        	gzstream_include="-I$withval"
-			gzstream_ldflags="-Wl,-rpath,$withval -L$withval"
-		else
-          	as_fn_error $? "Cannot stat directory $withval" "$LINENO" 5
-      	fi  
-        
-fi
-
-
-#with_bamtools="/Users/zd1/opt/software/bamtools-2.3.0"
-#bamtools_include="-I$with_bamtools/include"
-#bamtools_ldflags="-Wl,-rpath,$with_bamtools/lib -L$with_bamtools/lib"
-
-#with_gzstream="/Users/zd1/opt/software/gzstream"
-#gzstream_include="-I$with_gzstream"
-#gzstream_ldflags="-Wl,-rpath,$with_gzstream -L$with_gzstream"
-
-# Set compiler flags.
-AM_CXXFLAGS="-Wall -Wextra -Werror -Wno-unknown-pragmas"
-
-CXXFLAGS="-O3"
-
-CFLAGS="-O3"
-
-CPPFLAGS="$CPPFLAGS $bamtools_include $gzstream_include"
-
-LDFLAGS="$bamtools_ldflags $gzstream_ldflags $LDFLAGS"
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"CPPFLAGS is $CPPFLAGS\"" >&5
-$as_echo "$as_me: \"CPPFLAGS is $CPPFLAGS\"" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LDFLAGS is $LDFLAGS\"" >&5
-$as_echo "$as_me: \"LDFLAGS is $LDFLAGS\"" >&6;}
-
-# We always need to specify to link in bamtools
-LIBS="$LIBS -lbamtools"
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LIBS is $LIBS\"" >&5
-$as_echo "$as_me: \"LIBS is $LIBS\"" >&6;}
-
-# Make sure the bamtools headers can be found
 ac_fn_cxx_check_header_mongrel "$LINENO" "api/BamReader.h" "ac_cv_header_api_BamReader_h" "$ac_includes_default"
 if test "x$ac_cv_header_api_BamReader_h" = xyes; then :
   
@@ -4814,18 +4664,7 @@ fi
 
 
 
-# Make sure the gzstream headers can be found
-ac_fn_cxx_check_header_mongrel "$LINENO" "gzstream.h" "ac_cv_header_gzstream_h" "$ac_includes_default"
-if test "x$ac_cv_header_gzstream_h" = xyes; then :
-  
-else
-  as_fn_error $? "gzstream library must be installed(http://www.cs.unc.edu/Research/compgeom/gzstream/). \ 
-You can specify its path with the --with-gzstream=PATH option" "$LINENO" 5
-fi
-
-
-
-ac_config_files="$ac_config_files Makefile Telseq/Makefile Util/Makefile Thirdparty/Makefile doc/Makefile examples/Makefile man/Makefile scripts/Makefile"
+ac_config_files="$ac_config_files Makefile Telseq/Makefile Util/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5562,11 +5401,6 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "Telseq/Makefile") CONFIG_FILES="$CONFIG_FILES Telseq/Makefile" ;;
     "Util/Makefile") CONFIG_FILES="$CONFIG_FILES Util/Makefile" ;;
-    "Thirdparty/Makefile") CONFIG_FILES="$CONFIG_FILES Thirdparty/Makefile" ;;
-    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
-    "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
-    "man/Makefile") CONFIG_FILES="$CONFIG_FILES man/Makefile" ;;
-    "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -1,7 +1,7 @@
 TelSeq is a software that estimates telomere length from 
 whole genome sequencing data (BAMs). 
 
-The most current development version is always available from our
+The most current development version is available from our
 git repository:
 git://github.com/zd1/telseq.git
 
@@ -11,23 +11,77 @@ EXAMPLE USAGE
 The software can be run straightaway after download as a command line 
 tool. 
 
-Analysing a single BAM
----------------------------------
-python run.py --name mysample1 --output-dir tests/ tests/test.1.bam
- 
-Analysing a list of BAMs 
----------------------------------
-In this mode, paths of the BAMs should be listed in a text file, i.e. 
-named bamlist in the following examples
-TelSeq can be run in the following two ways:
-(1). Analyse BAMs sequentially (may take a very long time)
-python run.py --bams tests/bamlist --output-dir tests/
- 
-(2). Analyse BAMs in parallel, i.e. on a computing cluster. Each run 
-requires an index number, ranging from 1 to the total number of BAMs, 
-indicating which BAM in the bamlist to be analysed. 
-# To analyse the 1st BAM in the bamlist tests/bamlist
-python run.py --index 1  --bams tests/bamlist --output-dir tests/
+Compiling TelSeq
+---------------------------
 
-# And don't forget to merge them after all runs are completed. 
-python run.py --merge --bams tests/bamlist --output-dir tests/
+TelSeq dependencies:
+	-the bamtools library (https://github.com/pezmaster31/bamtools)
+
+To compile the software, run
+./autogen.sh
+then
+./configure 
+then 
+make
+
+The executable binary will be at src/Telseq/telseq
+
+If bamtools are installed not at the system location, you can 
+specify their location by 
+./configure  --with-bamtools=/path/to/bamtools
+
+The /path/to/bamtools directory is the one that contains lib and include sub directories
+of it. 
+
+
+Running TelSeq
+---------------------------------
+
+# Analyse one or more BAMs 
+> telseq a.bam b.bam 
+
+# Analyse a list of BAMs specified in a 'bamlist' file. 
+
+bamlist should contains only 1 column, with each row the path of a BAM. i.e. 
+bamlist:
+/path/to/a.bam
+/path/to/b.bam
+
+> telseq -f bamlist
+
+# Use pipe to provide a list of BAM files 
+cat bamlist | telseq
+
+The result files will be named as BAM file name with 'bamscan' suffix, i.e. 
+for a.bam, it will be a.bam.bamscan. 
+
+# By default the headers of the result files are suppressed, thus the results 
+can be combined by 
+
+> cat a.bam.bamscan b.bam.bamscan  >> all.bamscan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

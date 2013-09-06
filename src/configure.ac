@@ -14,24 +14,6 @@ AC_PROG_RANLIB
 
 # Checks for header files.
 AC_LANG([C++])
-AC_CHECK_HEADER([zlib.h])
- 
-# Checks for library functions.
-AC_SEARCH_LIBS([gzopen],[z],,[AC_MSG_ERROR([libz not found, please install zlib (http://www.zlib.net/)])])
-
-# Check for the bamtools library path
-# Bamtools has two different path formats
-# If it is built in place the files will be in {path}/lib/ and {path}/include/
-# If it is installed (with make install) it will be in {path}/include/bamtools
-# and {path}/lib/bamtools. Both variants are handled here
-
-#AC_ARG_WITH(bamtools, AS_HELP_STRING([--with-bamtools=PATH],
-#	[specify directory containing the bamtools library (http://github.com/pezmaster31/bamtools)])
-
-#if test -d "$with_bamtools"; then
-#    bamtools_ldflags="-Wl,-rpath,$with_bamtools/lib -L$with_bamtools/lib"
-#    bamtools_include="-I$with_bamtools/include"
-#fi
 
 AC_ARG_WITH(bamtools,
         AS_HELP_STRING([--with-bamtools=DIR], [specify directory containing the bamtools library (http://github.com/pezmaster31/bamtools)]),
@@ -42,24 +24,6 @@ AC_ARG_WITH(bamtools,
           	AC_MSG_ERROR([Cannot stat directory $withval])
       	fi ] 
         )
-
-AC_ARG_WITH(gzstream,
-        AS_HELP_STRING([--with-gzstream=DIR], [specify directory containing the gzstream library (http://www.cs.unc.edu/Research/compgeom/gzstream/)]),
-        [ if test -d "$withval" ; then
-        	gzstream_include="-I$withval"
-			gzstream_ldflags="-Wl,-rpath,$withval -L$withval"
-		else
-          	AC_MSG_ERROR([Cannot stat directory $withval])
-      	fi ] 
-        )
-
-#with_bamtools="/Users/zd1/opt/software/bamtools-2.3.0"
-#bamtools_include="-I$with_bamtools/include"
-#bamtools_ldflags="-Wl,-rpath,$with_bamtools/lib -L$with_bamtools/lib"
-
-#with_gzstream="/Users/zd1/opt/software/gzstream"
-#gzstream_include="-I$with_gzstream"
-#gzstream_ldflags="-Wl,-rpath,$with_gzstream -L$with_gzstream"
 
 # Set compiler flags.
 AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Werror -Wno-unknown-pragmas")
@@ -81,19 +45,9 @@ AC_CHECK_HEADER([api/BamReader.h],,[AC_MSG_ERROR(
 [The bamtools library must be installed (http://github.com/pezmaster31/bamtools). \
 You can specify its path with the --with-bamtools=PATH option])])
 
-# Make sure the gzstream headers can be found
-AC_CHECK_HEADER([gzstream.h],,[AC_MSG_ERROR(
-[gzstream library must be installed(http://www.cs.unc.edu/Research/compgeom/gzstream/). \ 
-You can specify its path with the --with-gzstream=PATH option])])
-
 AC_CONFIG_FILES([Makefile
 		Telseq/Makefile
-		Util/Makefile
-		Thirdparty/Makefile
-		 doc/Makefile 
-		 examples/Makefile 
-		 man/Makefile 
-		 scripts/Makefile])
+		Util/Makefile])
 
 AC_OUTPUT
 

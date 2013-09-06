@@ -78,7 +78,7 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in README compile install-sh missing
+	$(srcdir)/config.h.in compile depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -188,18 +188,18 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/missing aclocal-1.14
+ACLOCAL = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_CXXFLAGS = -Wall -Wextra -Werror -Wno-unknown-pragmas
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/missing autoconf
-AUTOHEADER = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/missing autoheader
-AUTOMAKE = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/missing automake-1.14
+AUTOCONF = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" autoconf
+AUTOHEADER = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" autoheader
+AUTOMAKE = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" automake-1.14
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -O3
-CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0/include -I/Users/zd1/opt/software/gzstream
+CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0/include 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -218,11 +218,11 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib -L/Users/zd1/opt/software/bamtools-2.3.0/lib -Wl,-rpath,/Users/zd1/opt/software/gzstream -L/Users/zd1/opt/software/gzstream 
+LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib -L/Users/zd1/opt/software/bamtools-2.3.0/lib  
 LIBOBJS = 
-LIBS = -lz  -lbamtools
+LIBS =  -lbamtools
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/missing makeinfo
+MAKEINFO = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" makeinfo
 MKDIR_P = ./install-sh -c -d
 OBJEXT = o
 PACKAGE = telseq
@@ -238,10 +238,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 0.0.1
-abs_builddir = /Users/zd1/Documents/workspace-cpp/telseq/src
-abs_srcdir = /Users/zd1/Documents/workspace-cpp/telseq/src
-abs_top_builddir = /Users/zd1/Documents/workspace-cpp/telseq/src
-abs_top_srcdir = /Users/zd1/Documents/workspace-cpp/telseq/src
+abs_builddir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
+abs_srcdir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
+abs_top_builddir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
+abs_top_srcdir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -261,7 +261,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/zd1/Documents/workspace-cpp/telseq/src/install-sh
+install_sh = ${SHELL} '/Users/zd1/Google Drive/PhD/workspace/telseq/src/install-sh'
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -282,7 +282,7 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = Thirdparty Util Telseq
+SUBDIRS = Util Telseq
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

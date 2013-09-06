@@ -104,15 +104,13 @@ telseq-telseq.o telseq-telseq.o: telseq.cpp \
   /usr/include/c++/4.2.1/bits/stl_map.h \
   /usr/include/c++/4.2.1/bits/stl_multimap.h ../Util/Util.h \
   /usr/include/c++/4.2.1/list /usr/include/c++/4.2.1/bits/stl_list.h \
-  /usr/include/c++/4.2.1/bits/list.tcc /usr/include/c++/4.2.1/cassert \
-  /usr/include/assert.h /usr/include/c++/4.2.1/sstream \
-  /usr/include/c++/4.2.1/bits/sstream.tcc /usr/include/math.h \
-  ../Thirdparty/gzstream.h /usr/include/zlib.h /usr/include/zconf.h \
-  /usr/include/sys/types.h ../config.h ../Util/Timer.h \
-  /usr/include/sys/time.h \
+  /usr/include/c++/4.2.1/bits/list.tcc /usr/include/c++/4.2.1/sstream \
+  /usr/include/c++/4.2.1/bits/sstream.tcc ../config.h ../Util/Timer.h \
+  /usr/include/sys/time.h /usr/include/math.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamReader.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/api_global.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/shared/bamtools_global.h \
+  /usr/include/c++/4.2.1/cassert /usr/include/assert.h \
   /usr/include/c++/4.2.1/stdexcept \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAlignment.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAux.h \
@@ -443,23 +441,9 @@ telseq.h:
 
 /usr/include/c++/4.2.1/bits/list.tcc:
 
-/usr/include/c++/4.2.1/cassert:
-
-/usr/include/assert.h:
-
 /usr/include/c++/4.2.1/sstream:
 
 /usr/include/c++/4.2.1/bits/sstream.tcc:
-
-/usr/include/math.h:
-
-../Thirdparty/gzstream.h:
-
-/usr/include/zlib.h:
-
-/usr/include/zconf.h:
-
-/usr/include/sys/types.h:
 
 ../config.h:
 
@@ -467,11 +451,17 @@ telseq.h:
 
 /usr/include/sys/time.h:
 
+/usr/include/math.h:
+
 /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamReader.h:
 
 /Users/zd1/opt/software/bamtools-2.3.0/include/api/api_global.h:
 
 /Users/zd1/opt/software/bamtools-2.3.0/include/shared/bamtools_global.h:
+
+/usr/include/c++/4.2.1/cassert:
+
+/usr/include/assert.h:
 
 /usr/include/c++/4.2.1/stdexcept:
 

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "telseq.h"
 #include "Timer.h"
+#include "math.h"
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 

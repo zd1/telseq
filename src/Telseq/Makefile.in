@@ -92,8 +92,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_telseq_OBJECTS = telseq-telseq.$(OBJEXT)
 telseq_OBJECTS = $(am_telseq_OBJECTS)
-telseq_DEPENDENCIES = $(top_builddir)/Util/libutil.a \
-	$(top_builddir)/Thirdparty/libthirdparty.a
+telseq_DEPENDENCIES = $(top_builddir)/Util/libutil.a
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -260,12 +259,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 telseq_CPPFLAGS = \
-	-I$(top_srcdir)/Util \
-	-I$(top_srcdir)/Thirdparty
+	-I$(top_srcdir)/Util
 
 telseq_LDADD = \
-	$(top_builddir)/Util/libutil.a \
-	$(top_builddir)/Thirdparty/libthirdparty.a
+	$(top_builddir)/Util/libutil.a
 
 telseq_SOURCES = telseq.cpp telseq.h 
 all: all-am
