@@ -42,7 +42,7 @@ static const char *TELSEQ_USAGE_MESSAGE =
 namespace opt
 {
     static StringVector bamlist;
-    static std::string outputfile = "";
+    static std::string outputdir = "";
     static bool writerheader = true;
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
 }
@@ -169,10 +169,10 @@ int scanBam()
 int printresults(std::map<std::string, ScanResults> resultmap, std::string tab){
 
 	std::string filepath = "";
-	if(opt::outputfile.empty()){
+	if(opt::outputdir.empty()){
 		filepath = tab + "." + ScanParameters::SCAN_FILE_SUFFIX;
 	}else{
-		filepath = opt::outputfile;
+		filepath = opt::outputdir + "/" + tab + "." + ScanParameters::SCAN_FILE_SUFFIX;
 	}
 
 	std::ostream* pWriter = createWriter(filepath);
@@ -303,7 +303,7 @@ void parseScanOptions(int argc, char** argv)
             case 'f':
             	arg >> bamlistfile; break;
             case 'o':
-            	arg >> opt::outputfile; break;
+            	arg >> opt::outputdir; break;
             case 'H':
             	opt::writerheader=false; break;
             case 'h':

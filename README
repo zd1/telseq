@@ -8,8 +8,8 @@ git://github.com/zd1/telseq.git
 The software is implemented in C++. 
 
 We also have a Python implementation. But it is not updated anymore.
-You could switch to branch 'python' use the 'branch' button above 
-and follow the instruction there.
+You could switch to branch 'python' using the 'branch' button above 
+and follow the instructions there.
 
 
 Compiling TelSeq
@@ -37,24 +37,46 @@ The /path/to/bamtools directory is the directory that contains 'lib' and 'includ
 Running TelSeq
 =============================
 
-# Analyse one or more BAMs 
+# Read options and usage information 
+---------------------------
+> telseq
+
+# Analyse one or more BAMs by specifying BAM file path as command line arguments.
+---------------------------
 > telseq a.bam b.bam 
 
-# Analyse a list of BAMs specified in a 'bamlist' file. 
+# Analyse a list of BAMs whose paths are specified in a 'bamlist' file. 
+---------------------------
+bamlist should contains only 1 column with each row the path of a BAM. i.e. 
 
-bamlist should contains only 1 column, with each row the path of a BAM. i.e. 
-bamlist:
 /path/to/a.bam
 /path/to/b.bam
 
 > telseq -f bamlist
 
-# Use pipe to provide a list of BAM files 
-cat bamlist | telseq
+# BAM file path can also be provided by piping in a 'bamlist', whose format must be 
+# same as above 
+---------------------------
+> cat bamlist | telseq
 
-The result files will be named as BAM file name with 'bamscan' suffix, i.e. 
-for a.bam, it will be a.bam.bamscan. 
+# output
+---------------------------
+The result file will be named as the input BAM file name (without directories) 
+with a 'bamscan' suffix, i.e. if the input BAM is '/path/to/a.bam', the result file will
+be named as 'a.bam.bamscan'. 
 
+By default, the output are stored in the current directory. This can be changed by using
+'-o' option. 
+
+> telseq -o /path/to/output a.bam b.bam c.bam
+
+The result files will be
+/path/to/output/a.bam.bamscan
+/path/to/output/b.bam.bamscan
+/path/to/output/c.bam.bamscan
+
+# output file format
+---------------------------
 # By default the headers of the result files are suppressed, thus the results 
 can be combined by 
 
