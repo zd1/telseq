@@ -77,11 +77,31 @@ The result files will be
 
 # output file format
 ---------------------------
+
+# columns definations
+ReadGroup:    read group the result is corresponding to. Defined by the RG tag in BAM header. 
+Sample:    sample. Defined by the SM tag in BAM header. 
+Total:    total number of reads in this read group. 
+Mapped:    total number of mapped reads in this read group. Wether a read is mapped is determined by SAM flag 0x4. 
+Duplicates    :total number of duplicate reads in this read group. Wether a read is a duplicate is determined by SAM flag 0x400. 
+LENGH_ESTIMATE    :estimated telomere length
+TEL0:    read counts for reads containing no TTAGGG/CCCTAA repeats. 
+TEL1:    read counts for reads containing only 1 TTAGGG/CCCTAA repeats. 
+TEL[n]:    read counts for reads containing only n TTAGGG/CCCTAA repeats. 
+TEL[16]:    read counts for reads containing 16 TTAGGG/CCCTAA repeats. 	
+GC0:    read counts for reads with GC composition between 40%-42%, 
+GC1:    read counts for reads with GC composition between 42%-44%, 
+GCn:    read counts for reads with GC composition between (40%+n*2%)-(42%+(n+1)*2%), 
+GC9:    read counts for reads with GC composition between 58%-60%, 
+
+
 # By default the headers of the result files are suppressed, thus the results 
 can be combined by 
 
 > cat a.bam.bamscan b.bam.bamscan  >> all.bamscan
 
+# Header only can be printed by
+> telseq -h
 
 
 
