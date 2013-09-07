@@ -5,37 +5,37 @@ The most current development version is available from our
 git repository:
 git://github.com/zd1/telseq.git
 
+The software is implemented in C++. 
 
-EXAMPLE USAGE
-============================
-The software can be run straightaway after download as a command line 
-tool. 
+We also have a Python implementation. But it is not updated anymore.
+You could switch to branch 'python' use the 'branch' button above 
+and follow the instruction there.
+
 
 Compiling TelSeq
+============================
+
+TelSeq dependency:
+--------------------------------
+- the bamtools library (https://github.com/pezmaster31/bamtools)
+
+
+Compiling
 ---------------------------
 
-TelSeq dependencies:
-	-the bamtools library (https://github.com/pezmaster31/bamtools)
-
-To compile the software, run
-./autogen.sh
-then
-./configure 
-then 
-make
-
+./configure && make
 The executable binary will be at src/Telseq/telseq
+
 
 If bamtools are installed not at the system location, you can 
 specify their location by 
 ./configure  --with-bamtools=/path/to/bamtools
 
-The /path/to/bamtools directory is the one that contains lib and include sub directories
-of it. 
+The /path/to/bamtools directory is the directory that contains 'lib' and 'include' sub directories. 
 
 
 Running TelSeq
----------------------------------
+=============================
 
 # Analyse one or more BAMs 
 > telseq a.bam b.bam 
