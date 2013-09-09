@@ -4,6 +4,7 @@
 #include <iterator>
 #include <fstream>
 #include <algorithm>
+#include <vector>
 #include "telseq.h"
 #include "Timer.h"
 #include "math.h"
@@ -47,7 +48,7 @@ namespace opt
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
 }
 
-static const char* shortopts = "f:o:k:Hh";
+static const char* shortopts = "f:o:k:Hhv";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
@@ -62,6 +63,7 @@ static const struct option longopts[] = {
 int scanBam()
 {
 
+	std::vector< std::map<std::string, ScanResults> > resultlist;
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
         // storing results for each read group (RG tag). use
@@ -158,14 +160,16 @@ int scanBam()
         std::cerr << "Completed scanning BAM\n";
         pBamReader->Close();
         delete pBamReader;
-        printresults(resultmap);
+
+        resultlist.push_back(resultmap);
     }
 
+    printresults(resultlist);
     return 0;
 }
 
 
-int printresults(std::map<std::string, ScanResults> resultmap){
+int printresults(std::vector< std::map<std::string, ScanResults> > resultlist){
 
 	std::ostream* pWriter;
 	bool tostdout = opt::outputfile.empty() ? true:false;
@@ -183,44 +187,47 @@ int printresults(std::map<std::string, ScanResults> resultmap){
 		*pWriter << "\n";
 	}
 
-	for(std::map<std::string, ScanResults>::iterator it= resultmap.begin();
-			it != resultmap.end(); ++it){
+	for(size_t i=0; i < resultlist.size();++i){
+		std::map<std::string, ScanResults> resultmap = resultlist[i];
+		for(std::map<std::string, ScanResults>::iterator it= resultmap.begin();
+				it != resultmap.end(); ++it){
 
-		ScanResults result = it -> second;
-		std::string rg = it ->first;
+			ScanResults result = it -> second;
+			std::string rg = it ->first;
 
-		if(rg == "UNKNOWN" && result.numTotal == 0){
-			continue;
-		}
+			if(rg == "UNKNOWN" && result.numTotal == 0){
+				continue;
+			}
 
-		*pWriter << rg << ScanParameters::FIELD_SEP;
-		*pWriter << result.sample << ScanParameters::FIELD_SEP;
-		*pWriter << result.numTotal << ScanParameters::FIELD_SEP;
-		*pWriter << result.numMapped << ScanParameters::FIELD_SEP;
-		*pWriter << result.numDuplicates << ScanParameters::FIELD_SEP;
+			*pWriter << rg << ScanParameters::FIELD_SEP;
+			*pWriter << result.sample << ScanParameters::FIELD_SEP;
+			*pWriter << result.numTotal << ScanParameters::FIELD_SEP;
+			*pWriter << result.numMapped << ScanParameters::FIELD_SEP;
+			*pWriter << result.numDuplicates << ScanParameters::FIELD_SEP;
 
-		result.telLenEstimate = calcTelLength(result);
-		if(result.telLenEstimate==-1){
-			std::cerr << "Telomere length estimate unknown. No read was found with telomeric GC composition.\n";
-			*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-		}else if(result.telLenEstimate>100000){
-			std::cerr << "Telomere length estimate unknown. Possibly due to not enough representation of genome.\n";
-			*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-		}else if(result.telLenEstimate==0){
-			std::cerr << "Telomere length estimate unknown. No read contains more than " << opt::tel_k << " telomere repeats.\n";
-			*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-		}
-		else{
-			*pWriter << result.telLenEstimate << ScanParameters::FIELD_SEP;
-		}
+			result.telLenEstimate = calcTelLength(result);
+			if(result.telLenEstimate==-1){
+				std::cerr << "Telomere length estimate unknown. No read was found with telomeric GC composition.\n";
+				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
+			}else if(result.telLenEstimate>100000){
+				std::cerr << "Telomere length estimate unknown. Possibly due to not enough representation of genome.\n";
+				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
+			}else if(result.telLenEstimate==0){
+				std::cerr << "Telomere length estimate unknown. No read contains more than " << opt::tel_k << " telomere repeats.\n";
+				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
+			}
+			else{
+				*pWriter << result.telLenEstimate << ScanParameters::FIELD_SEP;
+			}
 
-		for (std::size_t j = 0, max = result.telcounts.size(); j != max; ++j){
-			*pWriter << result.telcounts[j] << ScanParameters::FIELD_SEP;
+			for (std::size_t j = 0, max = result.telcounts.size(); j != max; ++j){
+				*pWriter << result.telcounts[j] << ScanParameters::FIELD_SEP;
+			}
+			for (std::size_t k = 0, max = result.gccounts.size(); k != max; ++k){
+				*pWriter << result.gccounts[k] << ScanParameters::FIELD_SEP;
+			}
+			*pWriter << "\n";
 		}
-		for (std::size_t k = 0, max = result.gccounts.size(); k != max; ++k){
-			*pWriter << result.gccounts[k] << ScanParameters::FIELD_SEP;
-		}
-		*pWriter << "\n";
 	}
 
 	if(!tostdout){
