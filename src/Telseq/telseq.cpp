@@ -31,7 +31,7 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "   <in.bam>                 one or more BAM files to be analyzed. This can also be from a pipe, which should contain 1 BAM path per row.\n"
 "   -f, --bamlist=STR        a file that contains a list of file paths of BAMs. It should have only one column, \n"
 "                            with each row a BAM file path. -f has higher priority than <in.bam>. When specified, <in.bam> are ignored.\n"
-"   -o, --output_dir=STR     output directory for results\n"
+"   -o, --output_dir=STR     output file for results. Ignored when input is from stdin, in which case output will be stdout. \n"
 "   -H                       remove header line (by default output header line)\n"
 "   -h                       print the header line only. The text can be used to attach to result files, useful when result file header is suppressed). \n"
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
@@ -42,7 +42,7 @@ static const char *TELSEQ_USAGE_MESSAGE =
 namespace opt
 {
     static StringVector bamlist;
-    static std::string outputdir = "";
+    static std::string outputfile = "";
     static bool writerheader = true;
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
 }
@@ -82,7 +82,7 @@ int scanBam()
         			it != header.ReadGroups.End();++it){
         		readgroups[it->ID]=it->Sample;
         	}
-        	std::cout<<"Specified BAM has "<< readgroups.size()<< " read groups" << std::endl;
+        	std::cerr<<"Specified BAM has "<< readgroups.size()<< " read groups" << std::endl;
 
         	for(std::map<std::string, std::string>::iterator it = readgroups.begin(); it != readgroups.end(); ++it){
         		ScanResults results;
@@ -155,7 +155,7 @@ int scanBam()
             c++;
         }
 
-        std::cout << "Completed scanning BAM\n";
+        std::cerr << "Completed scanning BAM\n";
         pBamReader->Close();
         delete pBamReader;
         std::string tab = stripDirectories(opt::bamlist[i]);
@@ -168,14 +168,13 @@ int scanBam()
 
 int printresults(std::map<std::string, ScanResults> resultmap, std::string tab){
 
-	std::string filepath = "";
-	if(opt::outputdir.empty()){
-		filepath = tab + "." + ScanParameters::SCAN_FILE_SUFFIX;
-	}else{
-		filepath = opt::outputdir + "/" + tab + "." + ScanParameters::SCAN_FILE_SUFFIX;
-	}
+	std::ostream* pWriter;
 
-	std::ostream* pWriter = createWriter(filepath);
+	if(opt::outputfile.empty()){
+		pWriter = stdout;
+	}else{
+		pWriter = createWriter(opt::outputfile);
+	}
 
 	if(opt::writerheader){
 		Headers hd;
@@ -303,7 +302,7 @@ void parseScanOptions(int argc, char** argv)
             case 'f':
             	arg >> bamlistfile; break;
             case 'o':
-            	arg >> opt::outputdir; break;
+            	arg >> opt::outputfile; break;
             case 'H':
             	opt::writerheader=false; break;
             case 'h':
@@ -315,7 +314,7 @@ void parseScanOptions(int argc, char** argv)
             case 'k':
             	arg >> opt::tel_k;
             	if(opt::tel_k < 1 or opt::tel_k > ScanParameters::TEL_MOTIF_N-1){
-            		std::cout << "k out of bound. k must be an integer from 1 to " <<  ScanParameters::TEL_MOTIF_N-1 << "\n";
+            		std::cerr << "k out of bound. k must be an integer from 1 to " <<  ScanParameters::TEL_MOTIF_N-1 << "\n";
             		exit(EXIT_FAILURE);
             	}
             	break;
@@ -345,6 +344,7 @@ void parseScanOptions(int argc, char** argv)
 				}
 				opt::bamlist.push_back(line);
 			}
+			opt::outputfile = ""; // when input is from stdin, ignore output file option. output to stdout.
 		}else if(bamlistfile.empty() ){ // check if not from a pipe, -f must be spceified
 //    		std::cerr << SUBPROGRAM ": No BAM specified. Please specify BAM either directly, by using -f option or piping BAM file path.\n";
     		std::cout << TELSEQ_USAGE_MESSAGE;
