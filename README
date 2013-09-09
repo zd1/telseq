@@ -61,19 +61,21 @@ bamlist should contains only 1 column with each row the path of a BAM. i.e.
 
 # output
 ---------------------------
-The result file will be named as the input BAM file name (without directories) 
-with a 'bamscan' suffix, i.e. if the input BAM is '/path/to/a.bam', the result file will
-be named as 'a.bam.bamscan'. 
-
-By default, the output are stored in the current directory. This can be changed by using
-'-o' option. 
+By default the result will be printed out to stdout. To change it to a file, use '-o'
+option to specify a file path. i.e.
 
 > telseq -o /path/to/output a.bam b.bam c.bam
 
-The result files will be
-/path/to/output/a.bam.bamscan
-/path/to/output/b.bam.bamscan
-/path/to/output/c.bam.bamscan
+This can also be achived by just direct the output to a file using '>', i.e.
+
+> telseq a.bam b.bam c.bam > /path/to/output
+
+The software will print out running status as well. To separate them from stdout, one 
+could direct log to a file, ie. 
+
+> telseq a.bam b.bam c.bam 2>outputlog
+
+
 
 # output file format
 ---------------------------
@@ -99,12 +101,14 @@ GCn:                read counts for reads with GC composition between
 GC9:                read counts for reads with GC composition between 58%-60%, 
 
 
-# By default the headers of the result files are suppressed, thus the results 
-can be combined by 
+By default for each BAM a header line will be printed out. This can be suppressed 
+by using the '-H' option. It is useful when one has multiple BAMs to scan and 
+wish the output to be merged together. i.e. 
 
-> cat a.bam.bamscan b.bam.bamscan  >> all.bamscan
+> telseq -H a.bam b.bam c.bam > myresult
 
-# Header only can be printed by
+To just print out the header, use '-h' option. i.e. 
+
 > telseq -h
 
 

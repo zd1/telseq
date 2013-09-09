@@ -158,20 +158,19 @@ int scanBam()
         std::cerr << "Completed scanning BAM\n";
         pBamReader->Close();
         delete pBamReader;
-        std::string tab = stripDirectories(opt::bamlist[i]);
-        printresults(resultmap, tab);
+        printresults(resultmap);
     }
 
     return 0;
 }
 
 
-int printresults(std::map<std::string, ScanResults> resultmap, std::string tab){
+int printresults(std::map<std::string, ScanResults> resultmap){
 
 	std::ostream* pWriter;
-
-	if(opt::outputfile.empty()){
-		pWriter = stdout;
+	bool tostdout = opt::outputfile.empty() ? true:false;
+	if(tostdout){
+		pWriter = &std::cout;
 	}else{
 		pWriter = createWriter(opt::outputfile);
 	}
@@ -224,7 +223,9 @@ int printresults(std::map<std::string, ScanResults> resultmap, std::string tab){
 		*pWriter << "\n";
 	}
 
-	delete pWriter;
+	if(!tostdout){
+		delete pWriter;
+	}
 	return 0;
 }
 
