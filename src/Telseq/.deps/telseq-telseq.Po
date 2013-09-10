@@ -103,10 +103,8 @@ telseq-telseq.o telseq-telseq.o: telseq.cpp \
   /usr/include/c++/4.2.1/map /usr/include/c++/4.2.1/bits/stl_tree.h \
   /usr/include/c++/4.2.1/bits/stl_map.h \
   /usr/include/c++/4.2.1/bits/stl_multimap.h ../Util/Util.h \
-  /usr/include/c++/4.2.1/list /usr/include/c++/4.2.1/bits/stl_list.h \
-  /usr/include/c++/4.2.1/bits/list.tcc /usr/include/c++/4.2.1/sstream \
-  /usr/include/c++/4.2.1/bits/sstream.tcc ../config.h ../Util/Timer.h \
-  /usr/include/sys/time.h /usr/include/math.h \
+  /usr/include/c++/4.2.1/sstream /usr/include/c++/4.2.1/bits/sstream.tcc \
+  ../config.h ../Util/Timer.h /usr/include/sys/time.h /usr/include/math.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamReader.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/api/api_global.h \
   /Users/zd1/opt/software/bamtools-2.3.0/include/shared/bamtools_global.h \
@@ -434,12 +432,6 @@ telseq.h:
 /usr/include/c++/4.2.1/bits/stl_multimap.h:
 
 ../Util/Util.h:
-
-/usr/include/c++/4.2.1/list:
-
-/usr/include/c++/4.2.1/bits/stl_list.h:
-
-/usr/include/c++/4.2.1/bits/list.tcc:
 
 /usr/include/c++/4.2.1/sstream:
 

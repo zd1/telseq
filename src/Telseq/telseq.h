@@ -26,8 +26,8 @@ namespace ScanParameters{
 	const float GC_UPPERBOUND = 0.6;
 	const float GC_BINSIZE = 0.02;
 
-	const float GC_TELOMERIC_LOWERBOUND = 0.58;
-	const float GC_TELOMERIC_UPPERBOUND = 0.62;
+	const float GC_TELOMERIC_LOWERBOUND = 0.48;
+	const float GC_TELOMERIC_UPPERBOUND = 0.52;
 
 	// maximum motif counts. add 1 to include 0 count.
 	const int TEL_MOTIF_N = READ_LENGTH/PATTERN.size() +1;

@@ -152,7 +152,7 @@ int scanBam()
             	resultmap[tag].gccounts[idx]+=1;
             }
 
-            if( (c+1) % 200000 == 0)
+            if( (c+1) % 2000000 == 0)
             	std::cerr <<"[scan] Processed " << resultmap[tag].numTotal << " reads \n" ;
             c++;
         }
@@ -266,14 +266,14 @@ int countMotif(std::string &read, std::string pattern, std::string pattern_revco
 	size_t p1 = read.find(pattern, 0);
 	while(p1 != std::string::npos)
 	{
-	    p1 = read.find(pattern,p1+1);
+	    p1 = read.find(pattern,p1+pattern.size());
 	    motifcount += 1;
 	}
 
 	size_t p2 = read.find(pattern_revcomp, 0);
 	while(p2 != std::string::npos)
 	{
-	    p2 = read.find(pattern_revcomp,p2+1);
+	    p2 = read.find(pattern_revcomp,p2+pattern_revcomp.size());
 	    motifcount += 1;
 	}
 

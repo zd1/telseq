@@ -5,12 +5,12 @@
 #define UTIL_H
 
 #include <vector>
-#include <list>
 #include <string>
 #include <istream>
 #include <fstream>
 #include <sstream>
 #include <stdint.h>
+#include <stdlib.h>
 #include <iostream>
 
 typedef std::vector<std::string> StringVector;
