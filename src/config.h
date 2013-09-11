@@ -35,10 +35,10 @@
 #define PACKAGE_BUGREPORT "zd1@sanger.ac.uk"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "Telseq"
+#define PACKAGE_NAME "TelSeq"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "Telseq 0.0.1"
+#define PACKAGE_STRING "TelSeq 0.0.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "telseq"

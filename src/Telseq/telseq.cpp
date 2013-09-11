@@ -261,23 +261,25 @@ double calcTelLength(ScanResults results){
 }
 
 int countMotif(std::string &read, std::string pattern, std::string pattern_revcomp){
-	int motifcount = 0;
+
+	int motifcount1 = 0;
+	int motifcount2 = 0;
 
 	size_t p1 = read.find(pattern, 0);
 	while(p1 != std::string::npos)
 	{
 	    p1 = read.find(pattern,p1+pattern.size());
-	    motifcount += 1;
+	    motifcount1 += 1;
 	}
 
 	size_t p2 = read.find(pattern_revcomp, 0);
 	while(p2 != std::string::npos)
 	{
 	    p2 = read.find(pattern_revcomp,p2+pattern_revcomp.size());
-	    motifcount += 1;
+	    motifcount2 += 1;
 	}
 
-	return motifcount;
+	return motifcount1 > motifcount2? motifcount1:motifcount2;
 
 }
 

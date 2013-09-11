@@ -18,8 +18,8 @@ AC_LANG([C++])
 AC_ARG_WITH(bamtools,
         AS_HELP_STRING([--with-bamtools=DIR], [specify directory containing the bamtools library (http://github.com/pezmaster31/bamtools)]),
         [ if test -d "$withval" ; then
-        	bamtools_include="-I$withval/include"
-			bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib"
+            bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib -Wl,-rpath,$withval/lib/bamtools -L$withval/lib/bamtools"
+    		bamtools_include="-I$withval/include -I$withval/include/bamtools"
 		else
           	AC_MSG_ERROR([Cannot stat directory $withval])
       	fi ] 
@@ -32,13 +32,13 @@ AC_SUBST(CFLAGS, "-O3")
 AC_SUBST(CPPFLAGS, "$CPPFLAGS $bamtools_include $gzstream_include")
 AC_SUBST(LDFLAGS, "$bamtools_ldflags $gzstream_ldflags $LDFLAGS")
 
-AC_MSG_NOTICE(["CPPFLAGS is $CPPFLAGS"])
-AC_MSG_NOTICE(["LDFLAGS is $LDFLAGS"])
+#AC_MSG_NOTICE(["CPPFLAGS is $CPPFLAGS"])
+#AC_MSG_NOTICE(["LDFLAGS is $LDFLAGS"])
 
 # We always need to specify to link in bamtools
 AC_SUBST(LIBS, "$LIBS -lbamtools")
 
-AC_MSG_NOTICE(["LIBS is $LIBS"])
+#AC_MSG_NOTICE(["LIBS is $LIBS"])
 
 # Make sure the bamtools headers can be found
 AC_CHECK_HEADER([api/BamReader.h],,[AC_MSG_ERROR(

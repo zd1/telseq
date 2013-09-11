@@ -11,6 +11,14 @@ We also have a Python implementation. But it is not updated anymore.
 You could switch to branch 'python' using the 'branch' button above 
 and follow the instructions there.
 
+Precompiled executables 
+============================
+For Mac OSX 
+bin/mac/telseq 
+
+For linux
+bin/linux/telseq
+
 
 Compiling TelSeq
 ============================
@@ -23,6 +31,7 @@ TelSeq dependency:
 Compiling
 ---------------------------
 
+Go to the src directory and run
 ./configure && make
 The executable binary will be at src/Telseq/telseq
 
@@ -92,8 +101,8 @@ Duplicates:         total number of duplicate reads in this read group.
 LENGH_ESTIMATE:     estimated telomere length
 TEL0:               read counts for reads containing no TTAGGG/CCCTAA repeats. 
 TEL1:               read counts for reads containing only 1 TTAGGG/CCCTAA repeats. 
-TELn:             read counts for reads containing only n TTAGGG/CCCTAA repeats. 
-TEL16:            read counts for reads containing 16 TTAGGG/CCCTAA repeats. 	
+TELn:               read counts for reads containing only n TTAGGG/CCCTAA repeats. 
+TEL16:              read counts for reads containing 16 TTAGGG/CCCTAA repeats. 	
 GC0:                read counts for reads with GC composition between 40%-42%, 
 GC1:                read counts for reads with GC composition between 42%-44%, 
 GCn:                read counts for reads with GC composition between 
