@@ -354,7 +354,6 @@ void parseScanOptions(int argc, char** argv)
 				}
 				opt::bamlist.push_back(line);
 			}
-			opt::outputfile = ""; // when input is from stdin, ignore output file option. output to stdout.
 		}else if(bamlistfile.empty() ){ // check if not from a pipe, -f must be spceified
 //    		std::cerr << SUBPROGRAM ": No BAM specified. Please specify BAM either directly, by using -f option or piping BAM file path.\n";
     		std::cout << TELSEQ_USAGE_MESSAGE;

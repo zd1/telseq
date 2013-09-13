@@ -4228,8 +4228,6 @@ if test "${with_bamtools+set}" = set; then :
   withval=$with_bamtools;  if test -d "$withval" ; then
             bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib -Wl,-rpath,$withval/lib/bamtools -L$withval/lib/bamtools"
     		bamtools_include="-I$withval/include -I$withval/include/bamtools"
-        	#bamtools_include="-I$withval/include"
-			#bamtools_ldflags="-Wl,-rpath,$withval/lib -L$withval/lib"
 		else
           	as_fn_error $? "Cannot stat directory $withval" "$LINENO" 5
       	fi
@@ -4249,17 +4247,14 @@ CPPFLAGS="$CPPFLAGS $bamtools_include $gzstream_include"
 LDFLAGS="$bamtools_ldflags $gzstream_ldflags $LDFLAGS"
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"CPPFLAGS is $CPPFLAGS\"" >&5
-$as_echo "$as_me: \"CPPFLAGS is $CPPFLAGS\"" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LDFLAGS is $LDFLAGS\"" >&5
-$as_echo "$as_me: \"LDFLAGS is $LDFLAGS\"" >&6;}
+#AC_MSG_NOTICE(["CPPFLAGS is $CPPFLAGS"])
+#AC_MSG_NOTICE(["LDFLAGS is $LDFLAGS"])
 
 # We always need to specify to link in bamtools
 LIBS="$LIBS -lbamtools"
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: \"LIBS is $LIBS\"" >&5
-$as_echo "$as_me: \"LIBS is $LIBS\"" >&6;}
+#AC_MSG_NOTICE(["LIBS is $LIBS"])
 
 # Make sure the bamtools headers can be found
 

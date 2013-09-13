@@ -18,7 +18,7 @@
 namespace ScanParameters{
 
 	static std::string FIELD_SEP="\t";
-	const unsigned int GENOME_LENGTH_AT_TEL_GC =  1097938400;
+	const unsigned int GENOME_LENGTH_AT_TEL_GC =  332720800;
 	const unsigned int READ_LENGTH=100;
 	const std::string PATTERN="TTAGGG";
 	const std::string PATTERN_REVCOMP="CCCTAA";
