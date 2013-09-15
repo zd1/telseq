@@ -245,7 +245,7 @@ double calcTelLength(ScanResults results){
 	}
 
 	float gc_tel = 0;
-	for(std::size_t i=0, max = ScanParameters::GC_BIN_N; i !=max; ++i){
+	for(std::size_t i=0, max = results.gccounts.size(); i !=max; ++i){
 		float gc1=ScanParameters::GC_LOWERBOUND + ScanParameters::GC_BINSIZE*i;
 		float gc2=ScanParameters::GC_LOWERBOUND + ScanParameters::GC_BINSIZE*(i+1);
 		if(gc1 >= ScanParameters::GC_TELOMERIC_LOWERBOUND && gc2 <= ScanParameters::GC_TELOMERIC_UPPERBOUND ){

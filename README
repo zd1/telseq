@@ -31,10 +31,15 @@ TelSeq dependency:
 Compiling
 ---------------------------
 
-Go to the src directory and run
-./configure && make
-The executable binary will be at src/Telseq/telseq
+Go to the src directory and run autogen.sh from the src directory to generate the configure file
+./autogen.sh
 
+Then run
+
+./configure 
+make
+
+The executable binary will be at src/Telseq/telseq
 
 If bamtools are installed not at the system location, you can 
 specify their location by 
