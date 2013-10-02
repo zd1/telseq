@@ -36,7 +36,8 @@ AC_SUBST(LDFLAGS, "$bamtools_ldflags $gzstream_ldflags $LDFLAGS")
 #AC_MSG_NOTICE(["LDFLAGS is $LDFLAGS"])
 
 # We always need to specify to link in bamtools
-AC_SUBST(LIBS, "$LIBS -lbamtools")
+AC_SUBST(LIBS, "$LIBS -lbamtools -lz")
+
 
 #AC_MSG_NOTICE(["LIBS is $LIBS"])
 

@@ -4251,7 +4251,8 @@ LDFLAGS="$bamtools_ldflags $gzstream_ldflags $LDFLAGS"
 #AC_MSG_NOTICE(["LDFLAGS is $LDFLAGS"])
 
 # We always need to specify to link in bamtools
-LIBS="$LIBS -lbamtools"
+LIBS="$LIBS -lbamtools -lz"
+
 
 
 #AC_MSG_NOTICE(["LIBS is $LIBS"])
