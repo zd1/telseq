@@ -35,6 +35,8 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "   -o, --output_dir=STR     output file for results. Ignored when input is from stdin, in which case output will be stdout. \n"
 "   -H                       remove header line (by default output header line)\n"
 "   -h                       print the header line only. The text can be used to attach to result files, useful when result file header is suppressed). \n"
+"   -m                       merge read groups by taking the weighted averages, by the number of reads in each read group, across all read groups.\n"
+"                            default is to output each readgroup separately.\n"
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
 "   --help                   display this help and exit\n"
 
@@ -45,10 +47,12 @@ namespace opt
     static StringVector bamlist;
     static std::string outputfile = "";
     static bool writerheader = true;
+    static bool mergerg = false;
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
+    static std::string unknown = "UNKNOWN";
 }
 
-static const char* shortopts = "f:o:k:Hhv";
+static const char* shortopts = "f:o:k:Hhvm";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
@@ -64,6 +68,9 @@ int scanBam()
 {
 
 	std::vector< std::map<std::string, ScanResults> > resultlist;
+//	std::ostream* pWriter;
+//	pWriter = &std::cout;
+
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
         // storing results for each read group (RG tag). use
@@ -79,7 +86,8 @@ int scanBam()
         const BamTools::SamHeader header = pBamReader ->GetHeader();
         std::map <std::string, std::string> readgroups;
 
-        if(header.HasReadGroups()){
+        bool rggroups = header.HasReadGroups();
+        if(rggroups){
         	for(BamTools::SamReadGroupConstIterator it = header.ReadGroups.Begin();
         			it != header.ReadGroups.End();++it){
         		readgroups[it->ID]=it->Sample;
@@ -91,16 +99,15 @@ int scanBam()
         		results.sample = it->second;
         		resultmap[it->first]=results; //results are identified by RG tag.
         	}
-        	ScanResults results;
-        	results.sample = "UNKNOWN";
-        	resultmap["UNKNOWN"]=results; //in case we can't find RG for some reads
+
         }else{
         	std::cerr << "Warning: can't find RG tag in the BAM header" << std::endl;
         	std::cerr << "Warning: treat all reads in BAM as if they were from a same sample" << std::endl;
         	ScanResults results;
-        	results.sample = "UNKNOWN";
-        	resultmap["UNKNOWN"]=results;
+        	results.sample = opt::unknown;
+        	resultmap[opt::unknown]=results;
         }
+
 
         BamTools::BamAlignment record1;
         bool done = false;
@@ -108,22 +115,23 @@ int scanBam()
         while(!done)
         {
             done = !pBamReader -> GetNextAlignment(record1);
-            std::string tag = "UNKNOWN";
-            if(record1.HasTag("RG")){
-            	record1.GetTag("RG", tag);
-//            	std::cerr << c << " reads:{" << record1.QueryBases << "} tag:{" << tag << "}\n";
-            }else{
-            	std::cerr << "can't find RG tag for read at position {" << record1.RefID << ":" << record1.Position << "}" << std::endl;
-            }
-            if(resultmap.find(tag) == resultmap.end()){
-            	std::cerr << "RG tag {" << tag << "} for read at position ";
-            	std::cerr << "{" << record1.RefID << ":" << record1.Position << "} doesn't exist in BAM header.";
-            	std::cerr << "skip this read" << std::endl;
-            	continue;
+            std::string tag = opt::unknown;
+            if(rggroups){
+            	if(record1.HasTag("RG")){
+					record1.GetTag("RG", tag);
+	//            	std::cerr << c << " reads:{" << record1.QueryBases << "} tag:{" << tag << "}\n";
+				}else{
+					std::cerr << "can't find RG tag for read at position {" << record1.RefID << ":" << record1.Position << "}" << std::endl;
+					std::cerr << "skip this read" << std::endl;
+					continue;
+				}
             }
 
-            if(done)
-                break;
+            if(resultmap.find(tag) == resultmap.end()){
+				std::cerr << "RG tag {" << tag << "} for read at position ";
+				std::cerr << "{" << record1.RefID << ":" << record1.Position << "} doesn't exist in BAM header.";
+				continue;
+            }
 
             resultmap[tag].numTotal +=1;
 
@@ -152,10 +160,14 @@ int scanBam()
             	resultmap[tag].gccounts[idx]+=1;
             }
 
-            if( (c+1) % 2000000 == 0)
-            	std::cerr <<"[scan] Processed " << resultmap[tag].numTotal << " reads \n" ;
+            if( (c+1) % 2000000 == 0){
+            	std::cout << "[scan] Processed " << c << " reads \n" ;
+//            	printout(tag, resultmap[tag], pWriter);
+            }
+
             c++;
         }
+
 
         std::cerr << "Completed scanning BAM\n";
         pBamReader->Close();
@@ -164,12 +176,44 @@ int scanBam()
         resultlist.push_back(resultmap);
     }
 
-    printresults(resultlist);
+    outputresults(resultlist);
     return 0;
 }
 
+void printout(std::string rg, ScanResults result, std::ostream* pWriter){
 
-int printresults(std::vector< std::map<std::string, ScanResults> > resultlist){
+	*pWriter << rg << ScanParameters::FIELD_SEP;
+	*pWriter << result.sample << ScanParameters::FIELD_SEP;
+	*pWriter << result.numTotal << ScanParameters::FIELD_SEP;
+	*pWriter << result.numMapped << ScanParameters::FIELD_SEP;
+	*pWriter << result.numDuplicates << ScanParameters::FIELD_SEP;
+
+	result.telLenEstimate = calcTelLength(result);
+	if(result.telLenEstimate==-1){
+		std::cerr << "Telomere length estimate unknown. No read was found with telomeric GC composition.\n";
+		*pWriter << opt::unknown << ScanParameters::FIELD_SEP;
+	}else if(result.telLenEstimate>1000000){
+		std::cerr << "Telomere length estimate unknown. Possibly due to not enough representation of genome.\n";
+		*pWriter << opt::unknown << ScanParameters::FIELD_SEP;
+	}else if(result.telLenEstimate==0){
+		std::cerr << "Telomere length estimate unknown. No read contains more than " << opt::tel_k << " telomere repeats.\n";
+		*pWriter << opt::unknown << ScanParameters::FIELD_SEP;
+	}
+	else{
+		*pWriter << result.telLenEstimate << ScanParameters::FIELD_SEP;
+	}
+
+	for (std::size_t j = 0, max = result.telcounts.size(); j != max; ++j){
+		*pWriter << result.telcounts[j] << ScanParameters::FIELD_SEP;
+	}
+	for (std::size_t k = 0, max = result.gccounts.size(); k != max; ++k){
+		*pWriter << result.gccounts[k] << ScanParameters::FIELD_SEP;
+	}
+	*pWriter << "\n";
+}
+
+
+int outputresults(std::vector< std::map<std::string, ScanResults> > resultlist){
 
 	std::ostream* pWriter;
 	bool tostdout = opt::outputfile.empty() ? true:false;
@@ -187,47 +231,65 @@ int printresults(std::vector< std::map<std::string, ScanResults> > resultlist){
 		*pWriter << "\n";
 	}
 
+	ScanResults mergedrs;
+	std::string grpnames = "";
+
 	for(size_t i=0; i < resultlist.size();++i){
+
 		std::map<std::string, ScanResults> resultmap = resultlist[i];
+
+		// if merge read groups, take weighted average for all measures
+		bool domg = opt::mergerg && resultmap.size() > 1? true:false;
+
 		for(std::map<std::string, ScanResults>::iterator it= resultmap.begin();
 				it != resultmap.end(); ++it){
 
-			ScanResults result = it -> second;
 			std::string rg = it ->first;
+			ScanResults result = it -> second;
 
-			if(rg == "UNKNOWN" && result.numTotal == 0){
+			if(domg){
+				if(grpnames.size()==0){
+					grpnames += rg;
+				}else{
+					grpnames += "|"+rg;
+				}
+
+				mergedrs.sample = result.sample;
+				mergedrs.numTotal += result.numTotal;
+				mergedrs.numMapped += result.numMapped * result.numTotal;
+				mergedrs.numDuplicates += result.numDuplicates * result.numTotal;
+				mergedrs.telLenEstimate += calcTelLength(result)* result.numTotal;
+
+				for (std::size_t j = 0, max = result.telcounts.size(); j != max; ++j){
+					mergedrs.telcounts[j] += result.telcounts[j]* result.numTotal;
+				}
+				for (std::size_t k = 0, max = result.gccounts.size(); k != max; ++k){
+					mergedrs.gccounts[k] += result.gccounts[k]* result.numTotal;
+				}
 				continue;
+			}else{
+				printout(rg, result, pWriter);
 			}
-
-			*pWriter << rg << ScanParameters::FIELD_SEP;
-			*pWriter << result.sample << ScanParameters::FIELD_SEP;
-			*pWriter << result.numTotal << ScanParameters::FIELD_SEP;
-			*pWriter << result.numMapped << ScanParameters::FIELD_SEP;
-			*pWriter << result.numDuplicates << ScanParameters::FIELD_SEP;
-
-			result.telLenEstimate = calcTelLength(result);
-			if(result.telLenEstimate==-1){
-				std::cerr << "Telomere length estimate unknown. No read was found with telomeric GC composition.\n";
-				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-			}else if(result.telLenEstimate>100000){
-				std::cerr << "Telomere length estimate unknown. Possibly due to not enough representation of genome.\n";
-				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-			}else if(result.telLenEstimate==0){
-				std::cerr << "Telomere length estimate unknown. No read contains more than " << opt::tel_k << " telomere repeats.\n";
-				*pWriter << "UNKNOWN" << ScanParameters::FIELD_SEP;
-			}
-			else{
-				*pWriter << result.telLenEstimate << ScanParameters::FIELD_SEP;
-			}
-
-			for (std::size_t j = 0, max = result.telcounts.size(); j != max; ++j){
-				*pWriter << result.telcounts[j] << ScanParameters::FIELD_SEP;
-			}
-			for (std::size_t k = 0, max = result.gccounts.size(); k != max; ++k){
-				*pWriter << result.gccounts[k] << ScanParameters::FIELD_SEP;
-			}
-			*pWriter << "\n";
 		}
+
+		//in this case calculate weighted average
+		if(domg){
+
+			mergedrs.numMapped /= mergedrs.numTotal;
+			mergedrs.numDuplicates /= mergedrs.numTotal;
+			mergedrs.telLenEstimate /= mergedrs.numTotal;
+
+			for (std::size_t j = 0, max = mergedrs.telcounts.size(); j != max; ++j){
+				mergedrs.telcounts[j] /= mergedrs.numTotal;
+			}
+			for (std::size_t k = 0, max = mergedrs.gccounts.size(); k != max; ++k){
+				mergedrs.gccounts[k] /= mergedrs.numTotal;
+			}
+
+			mergedrs.numTotal  /= resultmap.size();
+
+			printout(grpnames, mergedrs, pWriter);
+		};
 	}
 
 	if(!tostdout){
@@ -235,7 +297,6 @@ int printresults(std::vector< std::map<std::string, ScanResults> > resultlist){
 	}
 	return 0;
 }
-
 
 double calcTelLength(ScanResults results){
 
@@ -315,6 +376,8 @@ void parseScanOptions(int argc, char** argv)
             	arg >> opt::outputfile; break;
             case 'H':
             	opt::writerheader=false; break;
+            case 'm':
+                opt::mergerg = true; break;
             case 'h':
         		for(size_t h=0; h<hd.headers.size();h++){
         			std::cout << hd.headers[h] << ScanParameters::FIELD_SEP;
