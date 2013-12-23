@@ -35,6 +35,7 @@ namespace ScanParameters{
 	const int GC_BIN_N = (int) ((GC_UPPERBOUND-GC_LOWERBOUND)/GC_BINSIZE+0.5);
 
 	const std::string LABEL_RG="ReadGroup";
+	const std::string LABEL_LB="Library";
 	const std::string LABEL_SAMPLE="Sample";
 	const std::string LABEL_BAM="BAM";
 	const std::string LABEL_TOTAL="Total";
@@ -42,7 +43,7 @@ namespace ScanParameters{
 	const std::string LABEL_DUP="Duplicates";
 	const std::string LABEL_TEL="TEL";
 	const std::string LABEL_GC="GC";
-	const std::string LABEL_LEN="LENGH_ESTIMATE";
+	const std::string LABEL_LEN="LENGTH_ESTIMATE";
 
 	const std::string SCAN_FILE_SUFFIX = "bamscan";
 
@@ -63,6 +64,7 @@ struct ScanResults
         telLenEstimate = 0;
     }
 	std::string sample;
+	std::string lib;
 	std::string bam;
 	std::vector<int> telcounts;
 	std::vector<int> gccounts;
@@ -80,6 +82,7 @@ struct Headers{
 	Headers(){setHeaders();}
 	void setHeaders(){
 		headers.push_back(ScanParameters::LABEL_RG);
+		headers.push_back(ScanParameters::LABEL_LB);
 		headers.push_back(ScanParameters::LABEL_SAMPLE);
 		headers.push_back(ScanParameters::LABEL_TOTAL);
 		headers.push_back(ScanParameters::LABEL_MAPPED);

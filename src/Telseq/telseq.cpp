@@ -29,14 +29,18 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "Contact: " AUTHOR " [" PACKAGE_BUGREPORT "]\n\n"
 "Usage: " PROGRAM_BIN " [OPTION] <in.1.bam> <in.2.bam> <...> \n"
 "Scan BAM and estimate telomere length. \n"
-"   <in.bam>                 one or more BAM files to be analyzed. This can also be from a pipe, which should contain 1 BAM path per row.\n"
-"   -f, --bamlist=STR        a file that contains a list of file paths of BAMs. It should have only one column, \n"
-"                            with each row a BAM file path. -f has higher priority than <in.bam>. When specified, <in.bam> are ignored.\n"
+"   <in.bam>                 one or more BAM files to be analysed. File names can also be passed from a pipe, \n "
+"                            with each row containing 1 BAM path.\n"
+"   -f, --bamlist=STR        a file that contains a list of file paths of BAMs. It should contain only one column, \n"
+"                            with each row a BAM file path. -f has higher priority than <in.bam>. When specified, \n"
+"                            <in.bam> are ignored.\n"
 "   -o, --output_dir=STR     output file for results. Ignored when input is from stdin, in which case output will be stdout. \n"
-"   -H                       remove header line (by default output header line)\n"
-"   -h                       print the header line only. The text can be used to attach to result files, useful when result file header is suppressed). \n"
-"   -m                       merge read groups by taking the weighted averages, by the number of reads in each read group, across all read groups.\n"
-"                            default is to output each readgroup separately.\n"
+"   -H                       remove header line, which is printed by default.\n"
+"   -h                       print the header line only. The text can be used to attach to result files, useful\n"
+"                            when the headers of the result files are suppressed. \n"
+"   -m                       merge read groups by taking weighted average, by the total number of reads in each read group,\n"
+"                            across all read groups for a sample. Default is to output each readgroup separately.\n"
+"   -u                       ignore read groups. Treat all reads in BAM as if they were from a same read group.\n"
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
 "   --help                   display this help and exit\n"
 
@@ -48,11 +52,12 @@ namespace opt
     static std::string outputfile = "";
     static bool writerheader = true;
     static bool mergerg = false;
+    static bool ignorerg = false;
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
     static std::string unknown = "UNKNOWN";
 }
 
-static const char* shortopts = "f:o:k:Hhvm";
+static const char* shortopts = "f:o:k:Hhvmu";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
@@ -83,31 +88,50 @@ int scanBam()
         BamTools::BamReader* pBamReader = new BamTools::BamReader;
         pBamReader->Open(opt::bamlist[i]);
 
-        const BamTools::SamHeader header = pBamReader ->GetHeader();
-        std::map <std::string, std::string> readgroups;
+        bool rggroups=false;
 
-        bool rggroups = header.HasReadGroups();
-        if(rggroups){
-        	for(BamTools::SamReadGroupConstIterator it = header.ReadGroups.Begin();
-        			it != header.ReadGroups.End();++it){
-        		readgroups[it->ID]=it->Sample;
-        	}
-        	std::cerr<<"Specified BAM has "<< readgroups.size()<< " read groups" << std::endl;
-
-        	for(std::map<std::string, std::string>::iterator it = readgroups.begin(); it != readgroups.end(); ++it){
-        		ScanResults results;
-        		results.sample = it->second;
-        		resultmap[it->first]=results; //results are identified by RG tag.
-        	}
-
-        }else{
-        	std::cerr << "Warning: can't find RG tag in the BAM header" << std::endl;
-        	std::cerr << "Warning: treat all reads in BAM as if they were from a same sample" << std::endl;
+        if(opt::ignorerg){ // ignore read groups
+        	std::cerr << "Treat all reads in BAM as if they were from a same sample" << std::endl;
         	ScanResults results;
         	results.sample = opt::unknown;
         	resultmap[opt::unknown]=results;
-        }
+        }else{
 
+        	const BamTools::SamHeader header = pBamReader ->GetHeader();
+			std::map <std::string, std::string> readgroups;
+			std::map <std::string, std::string> readlibs;
+
+			rggroups = header.HasReadGroups();
+
+			if(rggroups){
+				for(BamTools::SamReadGroupConstIterator it = header.ReadGroups.Begin();
+						it != header.ReadGroups.End();++it){
+					readgroups[it->ID]= it->Sample;
+					if(it->HasLibrary()){
+						readlibs[it->ID] = it -> Library;
+					}else{
+						readlibs[it->ID] = opt::unknown;
+					}
+				}
+				std::cerr<<"Specified BAM has "<< readgroups.size()<< " read groups" << std::endl;
+
+				for(std::map<std::string, std::string>::iterator it = readgroups.begin(); it != readgroups.end(); ++it){
+					ScanResults results;
+					std::string rgid = it -> first;
+					results.sample = it -> second;
+					results.lib = readlibs[rgid];
+					resultmap[rgid]=results; //results are identified by RG tag.
+				}
+
+			}else{
+				std::cerr << "Warning: can't find RG tag in the BAM header" << std::endl;
+				std::cerr << "Warning: treat all reads in BAM as if they were from a same sample" << std::endl;
+				ScanResults results;
+				results.sample = opt::unknown;
+				results.lib = opt::unknown;
+				resultmap[opt::unknown]=results;
+			}
+        }
 
         BamTools::BamAlignment record1;
         bool done = false;
@@ -183,6 +207,7 @@ int scanBam()
 void printout(std::string rg, ScanResults result, std::ostream* pWriter){
 
 	*pWriter << rg << ScanParameters::FIELD_SEP;
+	*pWriter << result.lib << ScanParameters::FIELD_SEP;
 	*pWriter << result.sample << ScanParameters::FIELD_SEP;
 	*pWriter << result.numTotal << ScanParameters::FIELD_SEP;
 	*pWriter << result.numMapped << ScanParameters::FIELD_SEP;
@@ -378,6 +403,8 @@ void parseScanOptions(int argc, char** argv)
             	opt::writerheader=false; break;
             case 'm':
                 opt::mergerg = true; break;
+            case 'u':
+                opt::ignorerg = true; break;
             case 'h':
         		for(size_t h=0; h<hd.headers.size();h++){
         			std::cout << hd.headers[h] << ScanParameters::FIELD_SEP;
