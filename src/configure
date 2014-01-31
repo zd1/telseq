@@ -4254,7 +4254,6 @@ LDFLAGS="$bamtools_ldflags $gzstream_ldflags $LDFLAGS"
 LIBS="$LIBS -lbamtools -lz"
 
 
-
 #AC_MSG_NOTICE(["LIBS is $LIBS"])
 
 # Make sure the bamtools headers can be found

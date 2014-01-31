@@ -38,7 +38,6 @@ AC_SUBST(LDFLAGS, "$bamtools_ldflags $gzstream_ldflags $LDFLAGS")
 # We always need to specify to link in bamtools
 AC_SUBST(LIBS, "$LIBS -lbamtools -lz")
 
-
 #AC_MSG_NOTICE(["LIBS is $LIBS"])
 
 # Make sure the bamtools headers can be found

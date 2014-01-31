@@ -77,8 +77,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = Util
-DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/depcomp
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -96,7 +95,7 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libutil_a_AR = $(AR) $(ARFLAGS)
 libutil_a_LIBADD =
-am_libutil_a_OBJECTS = Util.$(OBJEXT)
+am_libutil_a_OBJECTS =
 libutil_a_OBJECTS = $(am_libutil_a_OBJECTS)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -111,22 +110,6 @@ am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-am__mv = mv -f
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-AM_V_CXX = $(am__v_CXX_$(V))
-am__v_CXX_ = $(am__v_CXX_$(AM_DEFAULT_VERBOSITY))
-am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 = 
-CXXLD = $(CXX)
-CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-	-o $@
-AM_V_CXXLD = $(am__v_CXXLD_$(V))
-am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
-am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_$(V))
@@ -166,18 +149,18 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" aclocal-1.14
+ACLOCAL = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_CXXFLAGS = -Wall -Wextra -Werror -Wno-unknown-pragmas
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" autoconf
-AUTOHEADER = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" autoheader
-AUTOMAKE = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" automake-1.14
+AUTOCONF = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/missing autoconf
+AUTOHEADER = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/missing autoheader
+AUTOMAKE = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/missing automake-1.14
 AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -O3
-CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0/include -I/Users/zd1/opt/software/bamtools-2.3.0/include/bamtools 
+CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0//include -I/Users/zd1/opt/software/bamtools-2.3.0//include/bamtools 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -196,11 +179,11 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib -L/Users/zd1/opt/software/bamtools-2.3.0/lib -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib/bamtools -L/Users/zd1/opt/software/bamtools-2.3.0/lib/bamtools  
+LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0//lib -L/Users/zd1/opt/software/bamtools-2.3.0//lib -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0//lib/bamtools -L/Users/zd1/opt/software/bamtools-2.3.0//lib/bamtools  
 LIBOBJS = 
 LIBS =  -lbamtools -lz
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} "/Users/zd1/Google Drive/PhD/workspace/telseq/src/missing" makeinfo
+MAKEINFO = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/missing makeinfo
 MKDIR_P = .././install-sh -c -d
 OBJEXT = o
 PACKAGE = telseq
@@ -216,10 +199,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = 
 VERSION = 0.0.1
-abs_builddir = /Users/zd1/Google Drive/PhD/workspace/telseq/src/Util
-abs_srcdir = /Users/zd1/Google Drive/PhD/workspace/telseq/src/Util
-abs_top_builddir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
-abs_top_srcdir = /Users/zd1/Google Drive/PhD/workspace/telseq/src
+abs_builddir = /Users/zd1/google/PhD/workspace/telseq/src/Util
+abs_srcdir = /Users/zd1/google/PhD/workspace/telseq/src/Util
+abs_top_builddir = /Users/zd1/google/PhD/workspace/telseq/src
+abs_top_srcdir = /Users/zd1/google/PhD/workspace/telseq/src
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -239,7 +222,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} '/Users/zd1/Google Drive/PhD/workspace/telseq/src/install-sh'
+install_sh = ${SHELL} /Users/zd1/google/PhD/workspace/telseq/src/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -261,13 +244,11 @@ top_builddir = ..
 top_srcdir = ..
 noinst_LIBRARIES = libutil.a
 libutil_a_SOURCES = \
-        Util.h Util.cpp \
         Timer.h 
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -312,22 +293,6 @@ mostlyclean-compile:
 
 distclean-compile:
 	-rm -f *.tab.c
-
-include ./$(DEPDIR)/Util.Po
-
-.cpp.o:
-	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
-
-.cpp.obj:
-	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -450,7 +415,6 @@ clean: clean-am
 clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -496,7 +460,6 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -11,6 +11,7 @@
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 
+
 //
 // Getopt
 //
@@ -499,6 +500,29 @@ void parseScanOptions(int argc, char** argv)
 //    std::cerr << "opt::outputdir:" << opt::outputfile << "\n";
 
 }
+
+
+std::istream* createReader(const std::string& filename)
+{
+	std::ifstream* pReader = new std::ifstream(filename.c_str(), std::ifstream::in);
+	return pReader;
+}
+
+std::ostream* createWriter(const std::string& filename)
+{
+	std::ofstream* pWriter = new std::ofstream(filename.c_str(), std::ifstream::out);
+	return pWriter;
+}
+
+// Returns the size of the file. Code from stackoverflow.
+std::ifstream::pos_type getFilesize(const std::string& filename)
+{
+    std::ifstream in(filename.c_str(), std::ifstream::in | std::ifstream::binary);
+    in.seekg(0, std::ifstream::end);
+    return in.tellg();
+}
+
+
 
 int main(int argc, char** argv)
 {

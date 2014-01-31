@@ -12,8 +12,23 @@
 #include <getopt.h>
 #include <vector>
 #include <map>
-#include "Util.h"
+#include <sstream>
 #include "config.h"
+
+
+//
+// typedef
+//
+typedef std::vector<std::string> StringVector;
+
+//
+// template
+//
+template <typename T> std::string NumberToString (T Number ){
+     std::ostringstream ss;
+     ss << Number;
+     return ss.str();
+}
 
 namespace ScanParameters{
 
@@ -110,6 +125,10 @@ int outputresults(std::vector< std::map<std::string, ScanResults> > );
 void printout(std::string, ScanResults, std::ostream*);
 double calcTelLength(ScanResults results);
 int scanBam();
+
+std::ifstream::pos_type getFilesize(const std::string& filename);
+std::istream* createReader(const std::string& filename);
+std::ostream* createWriter(const std::string& filename);
 
 
 #endif /* TELSEQ_H_ */

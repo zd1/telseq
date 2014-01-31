@@ -97,6 +97,7 @@ could direct log to a file, ie.
 # column definations
 ReadGroup:          read group the result is corresponding to. 
                     Defined by the RG tag in BAM header. 
+Library:			sequencing library that the read group belongs to.
 Sample:             defined by the SM tag in BAM header. 
 Total:              total number of reads in this read group. 
 Mapped:             total number of mapped reads in this read group. 
