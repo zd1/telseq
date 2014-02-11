@@ -176,7 +176,7 @@ AWK = awk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -O3
-CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0//include -I/Users/zd1/opt/software/bamtools-2.3.0//include/bamtools 
+CPPFLAGS =  -I/Users/zd1/opt/software/bamtools-2.3.0/include -I/Users/zd1/opt/software/bamtools-2.3.0/include/bamtools 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -195,7 +195,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0//lib -L/Users/zd1/opt/software/bamtools-2.3.0//lib -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0//lib/bamtools -L/Users/zd1/opt/software/bamtools-2.3.0//lib/bamtools  
+LDFLAGS = -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib -L/Users/zd1/opt/software/bamtools-2.3.0/lib -Wl,-rpath,/Users/zd1/opt/software/bamtools-2.3.0/lib/bamtools -L/Users/zd1/opt/software/bamtools-2.3.0/lib/bamtools  
 LIBOBJS = 
 LIBS =  -lbamtools -lz
 LTLIBOBJS = 

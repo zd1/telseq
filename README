@@ -7,10 +7,6 @@ git://github.com/zd1/telseq.git
 
 The software is implemented in C++. 
 
-We also have a Python implementation. But it is not updated anymore.
-You could switch to branch 'python' using the 'branch' button above 
-and follow the instructions there.
-
 Precompiled executables 
 ============================
 For Mac OSX 

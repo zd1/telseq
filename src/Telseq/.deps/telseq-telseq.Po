@@ -105,23 +105,23 @@ telseq-telseq.o telseq-telseq.o: telseq.cpp \
   /usr/include/c++/4.2.1/bits/stl_multimap.h \
   /usr/include/c++/4.2.1/sstream /usr/include/c++/4.2.1/bits/sstream.tcc \
   ../config.h ../Util/Timer.h /usr/include/sys/time.h /usr/include/math.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamReader.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/api_global.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/shared/bamtools_global.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamReader.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/api_global.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/shared/bamtools_global.h \
   /usr/include/c++/4.2.1/cassert /usr/include/assert.h \
   /usr/include/c++/4.2.1/stdexcept \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamAlignment.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamAux.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamConstants.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamIndex.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamHeader.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamProgramChain.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamProgram.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamReadGroupDictionary.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamReadGroup.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamSequenceDictionary.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/SamSequence.h \
-  /Users/zd1/opt/software/bamtools-2.3.0//include/api/BamWriter.h
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAlignment.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAux.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamConstants.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamIndex.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamHeader.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamProgramChain.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamProgram.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamReadGroupDictionary.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamReadGroup.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamSequenceDictionary.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/SamSequence.h \
+  /Users/zd1/opt/software/bamtools-2.3.0/include/api/BamWriter.h
 
 /usr/include/c++/4.2.1/iostream:
 
@@ -443,11 +443,11 @@ telseq.h:
 
 /usr/include/math.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamReader.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamReader.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/api_global.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/api_global.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/shared/bamtools_global.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/shared/bamtools_global.h:
 
 /usr/include/c++/4.2.1/cassert:
 
@@ -455,26 +455,26 @@ telseq.h:
 
 /usr/include/c++/4.2.1/stdexcept:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamAlignment.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAlignment.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamAux.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamAux.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamConstants.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamConstants.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamIndex.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamIndex.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamHeader.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamHeader.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamProgramChain.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamProgramChain.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamProgram.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamProgram.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamReadGroupDictionary.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamReadGroupDictionary.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamReadGroup.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamReadGroup.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamSequenceDictionary.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamSequenceDictionary.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/SamSequence.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/SamSequence.h:
 
-/Users/zd1/opt/software/bamtools-2.3.0//include/api/BamWriter.h:
+/Users/zd1/opt/software/bamtools-2.3.0/include/api/BamWriter.h:
