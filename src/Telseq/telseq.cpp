@@ -5,11 +5,17 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <istream>
+#include <sstream>
+#include <set>
+#include <map>
+
 #include "telseq.h"
 #include "Timer.h"
 #include "math.h"
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
+#include "Util.h"
 
 
 //
@@ -43,6 +49,10 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "                            across all read groups for a sample. Default is to output each readgroup separately.\n"
 "   -u                       ignore read groups. Treat all reads in BAM as if they were from a same read group.\n"
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
+"\nTesting functions\n------------\n"
+"   -z                       use user specified pattern for searching.\n"
+"	-exomebed                specifiy exome regions in the BED format. These regions will be excluded when calculating estimates, thus \n"
+"                            an estimate of the absolute length can be obtained, same as is for the whole genome sequence BAMs.\n"
 "   --help                   display this help and exit\n"
 
 "\nReport bugs to " PACKAGE_BUGREPORT "\n\n";
@@ -56,9 +66,12 @@ namespace opt
     static bool ignorerg = false;
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
     static std::string unknown = "UNKNOWN";
+    static std::string PATTERN=ScanParameters::PATTERN;
+    static std::string PATTERN_REV=ScanParameters::PATTERN_REVCOMP;
+
 }
 
-static const char* shortopts = "f:o:k:Hhvmu";
+static const char* shortopts = "f:o:k:z:Hhvmu";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
@@ -69,6 +82,8 @@ static const struct option longopts[] = {
     { "version",            no_argument,       NULL, OPT_VERSION },
     { NULL, 0, NULL, 0 }
 };
+
+
 
 int scanBam()
 {
@@ -169,7 +184,7 @@ int scanBam()
             }
 
             double gc = calcGC(record1.QueryBases);
-            int ptn_count = countMotif(record1.QueryBases, ScanParameters::PATTERN, ScanParameters::PATTERN_REVCOMP);
+            int ptn_count = countMotif(record1.QueryBases, opt::PATTERN, opt::PATTERN_REV);
 
             resultmap[tag].telcounts[ptn_count]+=1;
 
@@ -347,6 +362,8 @@ double calcTelLength(ScanResults results){
 	return (acc/gc_tel)*float(ScanParameters::GENOME_LENGTH_AT_TEL_GC)/46000;
 }
 
+
+
 int countMotif(std::string &read, std::string pattern, std::string pattern_revcomp){
 
 	int motifcount1 = 0;
@@ -383,6 +400,8 @@ double calcGC(const std::string& seq)
     return num_gc / num_total;
 }
 
+
+
 //
 // Handle command line arguments
 //
@@ -390,6 +409,8 @@ void parseScanOptions(int argc, char** argv)
 {
 
 	std::string bamlistfile =  "";
+	std::string rev = "";
+
 	Headers hd;
     for (char c; (c = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1;)
     {
@@ -418,6 +439,13 @@ void parseScanOptions(int argc, char** argv)
             		std::cerr << "k out of bound. k must be an integer from 1 to " <<  ScanParameters::TEL_MOTIF_N-1 << "\n";
             		exit(EXIT_FAILURE);
             	}
+            	break;
+            case 'z':
+            	arg >> opt::PATTERN;
+            	for(size_t i=0;i<opt::PATTERN.size();i++){
+            		rev += complement(opt::PATTERN[i]);
+            	}
+            	opt::PATTERN_REV =  rev;
             	break;
             case OPT_HELP:
                 std::cout << TELSEQ_USAGE_MESSAGE;
@@ -499,27 +527,6 @@ void parseScanOptions(int argc, char** argv)
 //    std::cerr << "opt::tel_k:" << opt::tel_k << "\n";
 //    std::cerr << "opt::outputdir:" << opt::outputfile << "\n";
 
-}
-
-
-std::istream* createReader(const std::string& filename)
-{
-	std::ifstream* pReader = new std::ifstream(filename.c_str(), std::ifstream::in);
-	return pReader;
-}
-
-std::ostream* createWriter(const std::string& filename)
-{
-	std::ofstream* pWriter = new std::ofstream(filename.c_str(), std::ifstream::out);
-	return pWriter;
-}
-
-// Returns the size of the file. Code from stackoverflow.
-std::ifstream::pos_type getFilesize(const std::string& filename)
-{
-    std::ifstream in(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-    in.seekg(0, std::ifstream::end);
-    return in.tellg();
 }
 
 

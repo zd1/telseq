@@ -26,9 +26,14 @@ AC_ARG_WITH(bamtools,
         )
 
 # Set compiler flags.
-AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Werror -Wno-unknown-pragmas")
-AC_SUBST(CXXFLAGS, "-O3")
-AC_SUBST(CFLAGS, "-O3")
+#AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Werror -Wno-unknown-pragmas")
+AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Wno-unknown-pragmas")
+#AC_SUBST(CXXFLAGS, "-O3")
+#AC_SUBST(CFLAGS, "-O3")
+
+AC_SUBST(CXXFLAGS, "-std=c++11")
+AC_SUBST(CFLAGS, "-std=c++11")
+
 AC_SUBST(CPPFLAGS, "$CPPFLAGS $bamtools_include $gzstream_include")
 AC_SUBST(LDFLAGS, "$bamtools_ldflags $gzstream_ldflags $LDFLAGS")
 

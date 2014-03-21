@@ -4236,11 +4236,16 @@ fi
 
 
 # Set compiler flags.
-AM_CXXFLAGS="-Wall -Wextra -Werror -Wno-unknown-pragmas"
+#AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Werror -Wno-unknown-pragmas")
+AM_CXXFLAGS="-Wall -Wextra -Wno-unknown-pragmas"
 
-CXXFLAGS="-O3"
+#AC_SUBST(CXXFLAGS, "-O3")
+#AC_SUBST(CFLAGS, "-O3")
 
-CFLAGS="-O3"
+CXXFLAGS="-std=c++11"
+
+CFLAGS="-std=c++11"
+
 
 CPPFLAGS="$CPPFLAGS $bamtools_include $gzstream_include"
 

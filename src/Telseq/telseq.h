@@ -30,6 +30,8 @@ template <typename T> std::string NumberToString (T Number ){
      return ss.str();
 }
 
+
+
 namespace ScanParameters{
 
 	static std::string FIELD_SEP="\t";
@@ -126,9 +128,28 @@ void printout(std::string, ScanResults, std::ostream*);
 double calcTelLength(ScanResults results);
 int scanBam();
 
-std::ifstream::pos_type getFilesize(const std::string& filename);
-std::istream* createReader(const std::string& filename);
-std::ostream* createWriter(const std::string& filename);
+//std::ifstream::pos_type getFilesize(const std::string& filename);
+//std::istream* createReader(const std::string& filename);
+//std::ostream* createWriter(const std::string& filename);
 
+// Complement a base
+inline char complement(char base)
+{
+    switch(base)
+    {
+        case 'A':
+            return 'T';
+        case 'C':
+            return 'G';
+        case 'G':
+            return 'C';
+        case 'T':
+            return 'A';
+        case 'N':
+            return 'N';
+        default:
+            return 'N';
+    }
+}
 
 #endif /* TELSEQ_H_ */

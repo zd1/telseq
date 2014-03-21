@@ -7,6 +7,13 @@ git://github.com/zd1/telseq.git
 
 The software is implemented in C++. 
 
+Citation:
+
+Estimating telomere length from whole genome sequence data 
+Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin
+Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
+
+
 Precompiled executables 
 ============================
 For Mac OSX 
