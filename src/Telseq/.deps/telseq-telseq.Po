@@ -138,7 +138,7 @@ telseq-telseq.o: telseq.cpp \
   /usr/include/sys/unistd.h /usr/include/sys/_types/_posix_vdisable.h \
   /usr/include/sys/_types/_seek_set.h /usr/include/sys/select.h \
   /usr/include/sys/_select.h /usr/include/sys/_types/_uuid_t.h \
-  /usr/include/gethostuuid.h ../config.h ../Util/Timer.h \
+  /usr/include/gethostuuid.h ../config.h ../Util/Util.h ../Util/Timer.h \
   /usr/include/sys/time.h /usr/include/math.h \
   /Users/zd1/opt/software/bamtools//include/api/BamReader.h \
   /Users/zd1/opt/software/bamtools//include/api/api_global.h \
@@ -157,7 +157,11 @@ telseq-telseq.o: telseq.cpp \
   /Users/zd1/opt/software/bamtools//include/api/SamSequenceDictionary.h \
   /Users/zd1/opt/software/bamtools//include/api/SamSequence.h \
   /Users/zd1/opt/software/bamtools//include/api/BamWriter.h \
-  ../Util/Util.h
+  ../Util/prettyprint.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_set \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/cmath \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/valarray
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/iostream:
 
@@ -561,6 +565,8 @@ telseq.h:
 
 ../config.h:
 
+../Util/Util.h:
+
 ../Util/Timer.h:
 
 /usr/include/sys/time.h:
@@ -601,4 +607,12 @@ telseq.h:
 
 /Users/zd1/opt/software/bamtools//include/api/BamWriter.h:
 
-../Util/Util.h:
+../Util/prettyprint.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/unordered_set:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__hash_table:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/cmath:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/valarray:

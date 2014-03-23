@@ -14,21 +14,13 @@
 #include <map>
 #include <sstream>
 #include "config.h"
+#include "Util.h"
 
 
 //
 // typedef
 //
 typedef std::vector<std::string> StringVector;
-
-//
-// template
-//
-template <typename T> std::string NumberToString (T Number ){
-     std::ostringstream ss;
-     ss << Number;
-     return ss.str();
-}
 
 
 
@@ -79,6 +71,8 @@ struct ScanResults
         numMapped = 0;
         numDuplicates = 0;
         telLenEstimate = 0;
+        n_exreadsExcluded = 0;
+        n_exreadsChrUnmatched=0;
     }
 	std::string sample;
 	std::string lib;
@@ -90,6 +84,9 @@ struct ScanResults
 	unsigned int numDuplicates;
 	double telLenEstimate;
 
+	// logging data
+	unsigned int n_exreadsExcluded = 0;
+	unsigned int n_exreadsChrUnmatched=0;
 };
 
 // headers for the output
@@ -123,10 +120,12 @@ struct Headers{
 void parseScanOptions(int argc, char** argv);
 double calcGC(const std::string& seq);
 int countMotif(std::string &read, std::string pattern, std::string pattern_revcomp);
-int outputresults(std::vector< std::map<std::string, ScanResults> > );
-void printout(std::string, ScanResults, std::ostream*);
 double calcTelLength(ScanResults results);
 int scanBam();
+int outputresults(std::vector< std::map<std::string, ScanResults> > );
+void printlog(std::vector< std::map<std::string, ScanResults> > resultlist);
+void printout(std::string, ScanResults, std::ostream*);
+
 
 //std::ifstream::pos_type getFilesize(const std::string& filename);
 //std::istream* createReader(const std::string& filename);

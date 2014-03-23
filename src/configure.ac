@@ -51,8 +51,8 @@ AC_CHECK_HEADER([api/BamReader.h],,[AC_MSG_ERROR(
 You can specify its path with the --with-bamtools=PATH option])])
 
 AC_CONFIG_FILES([Makefile
-		Telseq/Makefile
-		Util/Makefile])
+		Util/Makefile
+    Telseq/Makefile])
 
 AC_OUTPUT
 

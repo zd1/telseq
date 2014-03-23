@@ -4666,7 +4666,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile Telseq/Makefile Util/Makefile"
+ac_config_files="$ac_config_files Makefile Util/Makefile Telseq/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5401,8 +5401,8 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "Telseq/Makefile") CONFIG_FILES="$CONFIG_FILES Telseq/Makefile" ;;
     "Util/Makefile") CONFIG_FILES="$CONFIG_FILES Util/Makefile" ;;
+    "Telseq/Makefile") CONFIG_FILES="$CONFIG_FILES Telseq/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

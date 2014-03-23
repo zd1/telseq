@@ -16,7 +16,7 @@
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 #include "Util.h"
-
+#include "prettyprint.h"
 
 //
 // Getopt
@@ -51,8 +51,9 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
 "\nTesting functions\n------------\n"
 "   -z                       use user specified pattern for searching.\n"
-"	-exomebed                specifiy exome regions in the BED format. These regions will be excluded when calculating estimates, thus \n"
-"                            an estimate of the absolute length can be obtained, same as is for the whole genome sequence BAMs.\n"
+"   -e, --exomebed=STR       specifiy exome regions in the BED format. These regions will be excluded when \n"
+"                            calculating estimates, thus an estimate of the absolute length can be obtained, \n"
+"                            same as is for the whole genome sequence BAMs.\n"
 "   --help                   display this help and exit\n"
 
 "\nReport bugs to " PACKAGE_BUGREPORT "\n\n";
@@ -61,6 +62,8 @@ namespace opt
 {
     static StringVector bamlist;
     static std::string outputfile = "";
+    static std::string exomebedfile = "";
+    static std::map< std::string, std::set<range> > exomebed;
     static bool writerheader = true;
     static bool mergerg = false;
     static bool ignorerg = false;
@@ -71,13 +74,14 @@ namespace opt
 
 }
 
-static const char* shortopts = "f:o:k:z:Hhvmu";
+static const char* shortopts = "f:o:k:z:e:Hhvmu";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
 static const struct option longopts[] = {
 	{ "bamlist",		optional_argument, NULL, 'f' },
     { "output-dir",		optional_argument, NULL, 'o' },
+    { "exomebed",		optional_argument, NULL, 'e' },
     { "help",               no_argument,       NULL, OPT_HELP },
     { "version",            no_argument,       NULL, OPT_VERSION },
     { NULL, 0, NULL, 0 }
@@ -91,12 +95,16 @@ int scanBam()
 	std::vector< std::map<std::string, ScanResults> > resultlist;
 //	std::ostream* pWriter;
 //	pWriter = &std::cout;
-
+	bool isExome = opt::exomebedfile.size()==0? false: true;
+	
+	std::cout << opt::bamlist << "\n";
+	
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
         // storing results for each read group (RG tag). use
         // read group ID as key.
         std::map<std::string, ScanResults> resultmap;
+
 
         std::cerr << "Start analysing BAM " << opt::bamlist[i] << "\n";
 
@@ -173,6 +181,27 @@ int scanBam()
 				continue;
             }
 
+            // for exome, exclude reads mapped to the exome regions. 
+            // this include read and its mate pair.
+            if(isExome){
+
+				range rg;
+				rg.first = record1.Position;
+				rg.second = record1.Position + record1.Length;
+				std::string chrm =  refID2Name(record1.RefID);
+				// std::cerr << "read: " << chrm << " " << rg << "\n" << std::endl;
+            	if(opt::exomebed.find(chrm) == opt::exomebed.end())
+				{
+				    std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file. \n " <<std::endl;
+					std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1 \n" << std::endl;
+					resultmap[tag].n_exreadsChrUnmatched +=1;
+				}else if (isRangeInbed(opt::exomebed[chrm],rg)) {
+					resultmap[tag].n_exreadsExcluded +=1;
+					continue;
+				}
+
+            }
+
             resultmap[tag].numTotal +=1;
 
             if(!record1.IsMapped())
@@ -206,19 +235,45 @@ int scanBam()
             }
 
             c++;
+
+            if(resultmap[tag].n_exreadsChrUnmatched > 1000){
+            	std::cerr<<"too many reads found with unmatched chromosome ID between BAM and exome BED. \n" << std::endl;
+            	exit(1);
+            }
+
         }
-
-
-        std::cerr << "Completed scanning BAM\n";
-        pBamReader->Close();
+		
+		pBamReader->Close();
         delete pBamReader;
-
+        
+        std::cerr << "Completed scanning BAM\n";
+	    
         resultlist.push_back(resultmap);
     }
 
     outputresults(resultlist);
+    printlog(resultlist);
     return 0;
 }
+
+void printlog(std::vector< std::map<std::string, ScanResults> > resultlist){
+
+	for(size_t i =0; i< resultlist.size(); i++){
+		auto rmap = resultlist[i];
+		for(std::map<std::string, ScanResults>::iterator it= rmap.begin();
+				it != rmap.end(); ++it){
+			
+			std::string rg = it ->first;
+			ScanResults result = it -> second;
+
+			std::cerr << "BAM:" << rg << std::endl;
+			std::cerr << "	chr ID unmatched reads: " << result.n_exreadsChrUnmatched << std::endl;
+			std::cerr << "	exome reads excluded: " << result.n_exreadsExcluded << std::endl;
+		}	
+	}
+
+}
+
 
 void printout(std::string rg, ScanResults result, std::ostream* pWriter){
 
@@ -447,6 +502,14 @@ void parseScanOptions(int argc, char** argv)
             	}
             	opt::PATTERN_REV =  rev;
             	break;
+
+            case 'e':
+            	arg >> opt::exomebedfile;
+            	opt::exomebed = readBedAsMap(opt::exomebedfile);
+            	std::cout << "loaded "<< opt::exomebed.size() << " exome regions \n"<< std::endl;
+            	std::cout << opt::exomebed << "\n";
+            	break;
+
             case OPT_HELP:
                 std::cout << TELSEQ_USAGE_MESSAGE;
                 exit(EXIT_SUCCESS);
