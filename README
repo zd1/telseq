@@ -14,15 +14,6 @@ Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin
 Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
 
 
-Precompiled executables 
-============================
-For Mac OSX 
-bin/mac/telseq 
-
-For linux
-bin/linux/telseq
-
-
 Compiling TelSeq
 ============================
 

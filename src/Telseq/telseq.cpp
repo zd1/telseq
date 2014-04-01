@@ -54,7 +54,7 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "   -z                       use user specified pattern for searching.\n"
 "   -e, --exomebed=STR       specifiy exome regions in the BED format. These regions will be excluded when \n"
 "                            calculating estimates, thus an estimate of the absolute length can be obtained, \n"
-"                            same as is for the whole genome sequence BAMs.\n"
+"                            same as that for the whole genome sequence BAMs.\n"
 "   --help                   display this help and exit\n"
 
 "\nReport bugs to " PACKAGE_BUGREPORT "\n\n";
