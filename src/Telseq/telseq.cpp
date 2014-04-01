@@ -9,6 +9,7 @@
 #include <sstream>
 #include <set>
 #include <map>
+#include <unistd.h>
 
 #include "telseq.h"
 #include "Timer.h"
@@ -63,7 +64,7 @@ namespace opt
     static StringVector bamlist;
     static std::string outputfile = "";
     static std::string exomebedfile = "";
-    static std::map< std::string, std::set<range> > exomebed;
+    static std::map< std::string, std::vector<range> > exomebed;
     static bool writerheader = true;
     static bool mergerg = false;
     static bool ignorerg = false;
@@ -105,15 +106,28 @@ int scanBam()
         // read group ID as key.
         std::map<std::string, ScanResults> resultmap;
 
-
+        // store where the overlap was last found in the case of exome seq
+    	std::map<std::string, std::vector<range>::iterator> lastfound;
+    	std::vector<range>::iterator searchhint;
+        
         std::cerr << "Start analysing BAM " << opt::bamlist[i] << "\n";
 
         // Open the bam files for reading/writing
         BamTools::BamReader* pBamReader = new BamTools::BamReader;
+
         pBamReader->Open(opt::bamlist[i]);
 
-        bool rggroups=false;
+        // get bam headers
+        const BamTools::SamHeader header = pBamReader ->GetHeader();
 
+//        for(BamTools::SamSequenceConstIterator it = header.Sequences.Begin();
+//        						it != header.Sequences.End();++it){
+//        	std::cout << "Assembly ID:" << it->AssemblyID << ", Name:" << it->Name << std::endl;
+//        }
+//        exit(0);
+
+        bool rggroups=false;
+        
         if(opt::ignorerg){ // ignore read groups
         	std::cerr << "Treat all reads in BAM as if they were from a same sample" << std::endl;
         	ScanResults results;
@@ -121,7 +135,7 @@ int scanBam()
         	resultmap[opt::unknown]=results;
         }else{
 
-        	const BamTools::SamHeader header = pBamReader ->GetHeader();
+
 			std::map <std::string, std::string> readgroups;
 			std::map <std::string, std::string> readlibs;
 
@@ -159,12 +173,17 @@ int scanBam()
 
         BamTools::BamAlignment record1;
         bool done = false;
-        int c=0;
+        
+        int nprocessed=0; // number of reads analyzed
+        int ntotal=0; // number of reads scanned in bam (we skip some reads, see below)
         while(!done)
         {
+            ntotal ++;
             done = !pBamReader -> GetNextAlignment(record1);
             std::string tag = opt::unknown;
             if(rggroups){
+                
+                // skip reads that do not have read group tag
             	if(record1.HasTag("RG")){
 					record1.GetTag("RG", tag);
 	//            	std::cerr << c << " reads:{" << record1.QueryBases << "} tag:{" << tag << "}\n";
@@ -174,32 +193,51 @@ int scanBam()
 					continue;
 				}
             }
-
+            
+            // skip reads with readgroup not defined in BAM header
             if(resultmap.find(tag) == resultmap.end()){
 				std::cerr << "RG tag {" << tag << "} for read at position ";
 				std::cerr << "{" << record1.RefID << ":" << record1.Position << "} doesn't exist in BAM header.";
 				continue;
             }
 
-            // for exome, exclude reads mapped to the exome regions. 
-            // this include read and its mate pair.
+            // for exome, exclude reads mapped to the exome regions.
             if(isExome){
-
 				range rg;
 				rg.first = record1.Position;
 				rg.second = record1.Position + record1.Length;
 				std::string chrm =  refID2Name(record1.RefID);
-				// std::cerr << "read: " << chrm << " " << rg << "\n" << std::endl;
-            	if(opt::exomebed.find(chrm) == opt::exomebed.end())
-				{
-				    std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file. \n " <<std::endl;
-					std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1 \n" << std::endl;
-					resultmap[tag].n_exreadsChrUnmatched +=1;
-				}else if (isRangeInbed(opt::exomebed[chrm],rg)) {
-					resultmap[tag].n_exreadsExcluded +=1;
-					continue;
-				}
 
+				if(chrm != "-1"){ // check if overlap exome when the read is mapped to chr1-22, X, Y
+					// std::cerr << "read: " << chrm << " " << rg << "\n" << std::endl;
+					std::map<std::string, std::vector<range> >::iterator chrmit = opt::exomebed.find(chrm);
+
+					if(chrmit == opt::exomebed.end())
+					{
+						std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file." <<std::endl;
+						std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1" << std::endl;
+						resultmap[tag].n_exreadsChrUnmatched +=1;
+					}else{
+
+						std::vector<range>::iterator itend = opt::exomebed[chrm].end();
+						std::map<std::string, std::vector<range>::iterator>::iterator lastfoundchrmit = lastfound.find(chrm);
+						if(lastfoundchrmit == lastfound.end()){ // first entry to this chrm
+							lastfound[chrm] = chrmit->second.begin();// start from begining
+						}
+
+						// set the hint to where the previous found is
+						searchhint = lastfound[chrm];
+						std::vector<range>::iterator itsearch = searchRange(searchhint, itend, rg);
+						// if found
+						if(itsearch != itend){// if found
+							searchhint = itsearch;
+							resultmap[tag].n_exreadsExcluded +=1;
+							lastfound[chrm] = searchhint; // update search hint
+							continue;
+						}
+					}
+
+				}
             }
 
             resultmap[tag].numTotal +=1;
@@ -223,36 +261,38 @@ int scanBam()
             	assert(idx >=0 && idx <= ScanParameters::GC_BIN_N-1);
 //            	std::cerr << c << " GC:{"<< gc << "} telcounts:{"<< ptn_count <<"} GC idx{" << idx << "}\n";
             	if(idx > ScanParameters::GC_BIN_N-1){
-            		std::cerr << c << " GC:{"<< gc << "} telcounts:{"<< ptn_count <<"} GC bin index out of bound:" << idx << "\n";
+            		std::cerr << nprocessed << " GC:{"<< gc << "} telcounts:{"<< ptn_count <<"} GC bin index out of bound:" << idx << "\n";
             		exit(EXIT_FAILURE);
             	}
             	resultmap[tag].gccounts[idx]+=1;
             }
-
-            if( (c+1) % 2000000 == 0){
-            	std::cout << "[scan] Processed " << c << " reads \n" ;
-//            	printout(tag, resultmap[tag], pWriter);
-            }
-
-            c++;
-
+            
             if(resultmap[tag].n_exreadsChrUnmatched > 1000){
             	std::cerr<<"too many reads found with unmatched chromosome ID between BAM and exome BED. \n" << std::endl;
-            	exit(1);
             }
+            
+            nprocessed++;
 
+            if( nprocessed%10000000 == 0){
+            	std::cerr << "[scan] processed " << nprocessed << " reads \n" ;
+                
+            }
+            
         }
-		
+        
 		pBamReader->Close();
         delete pBamReader;
         
+        std::cerr << "[scan] total reads in BAM scanned " << ntotal << std::endl;
         std::cerr << "Completed scanning BAM\n";
 	    
         resultlist.push_back(resultmap);
     }
 
     outputresults(resultlist);
-    printlog(resultlist);
+    if(isExome){
+    	printlog(resultlist);
+    }
     return 0;
 }
 
@@ -505,9 +545,9 @@ void parseScanOptions(int argc, char** argv)
 
             case 'e':
             	arg >> opt::exomebedfile;
-            	opt::exomebed = readBedAsMap(opt::exomebedfile);
+            	opt::exomebed = readBedAsVector(opt::exomebedfile);
             	std::cout << "loaded "<< opt::exomebed.size() << " exome regions \n"<< std::endl;
-            	std::cout << opt::exomebed << "\n";
+//            	std::cout << opt::exomebed << "\n";
             	break;
 
             case OPT_HELP:
@@ -573,7 +613,7 @@ void parseScanOptions(int argc, char** argv)
             opt::bamlist.push_back(line);
         }
 
-        int bamsize = opt::bamlist.size();
+        size_t bamsize = opt::bamlist.size();
         if(bamsize == 0 ){
             std::cerr << PROGRAM_BIN ": Could find any sample in BAMLIST file specified.\n";
             exit(EXIT_FAILURE);

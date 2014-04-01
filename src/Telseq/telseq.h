@@ -73,6 +73,7 @@ struct ScanResults
         telLenEstimate = 0;
         n_exreadsExcluded = 0;
         n_exreadsChrUnmatched=0;
+        n_totalunfiltered = 0;
     }
 	std::string sample;
 	std::string lib;
@@ -85,8 +86,10 @@ struct ScanResults
 	double telLenEstimate;
 
 	// logging data
-	unsigned int n_exreadsExcluded = 0;
+	unsigned int n_totalunfiltered = 0;
+    unsigned int n_exreadsExcluded = 0;
 	unsigned int n_exreadsChrUnmatched=0;
+    
 };
 
 // headers for the output

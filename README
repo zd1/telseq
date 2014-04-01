@@ -30,9 +30,17 @@ TelSeq dependency:
 --------------------------------
 - the bamtools library (https://github.com/pezmaster31/bamtools)
 
+- A modern version of GCC (version 4.8 or above)
+This can been seen by "gcc --version". 
+If multiple GCCs are installed in your system, please set environmental 
+variables pointing to the one of version 4.8 or above. i.e. in bash, 
+
+export CXX=/path/to/gcc/gcc-4.8.1/bin/g++
+export CC=/path/to/gcc/gcc-4.8.1/bin/gcc
+
 
 Compiling
----------------------------
+--------------------------- 
 
 Go to the src directory and run autogen.sh from the src directory to generate the configure file
 ./autogen.sh

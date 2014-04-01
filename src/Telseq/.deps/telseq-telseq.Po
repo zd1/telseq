@@ -134,12 +134,13 @@ telseq-telseq.o: telseq.cpp \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/set \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/__tree \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/map \
-  telseq.h /usr/include/getopt.h /usr/include/unistd.h \
-  /usr/include/sys/unistd.h /usr/include/sys/_types/_posix_vdisable.h \
+  /usr/include/unistd.h /usr/include/sys/unistd.h \
+  /usr/include/sys/_types/_posix_vdisable.h \
   /usr/include/sys/_types/_seek_set.h /usr/include/sys/select.h \
   /usr/include/sys/_select.h /usr/include/sys/_types/_uuid_t.h \
-  /usr/include/gethostuuid.h ../config.h ../Util/Util.h ../Util/Timer.h \
-  /usr/include/sys/time.h /usr/include/math.h \
+  /usr/include/gethostuuid.h telseq.h /usr/include/getopt.h ../config.h \
+  ../Util/Util.h ../Util/Timer.h /usr/include/sys/time.h \
+  /usr/include/math.h \
   /Users/zd1/opt/software/bamtools//include/api/BamReader.h \
   /Users/zd1/opt/software/bamtools//include/api/api_global.h \
   /Users/zd1/opt/software/bamtools//include/shared/bamtools_global.h \
@@ -543,10 +544,6 @@ telseq-telseq.o: telseq.cpp \
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/c++/v1/map:
 
-telseq.h:
-
-/usr/include/getopt.h:
-
 /usr/include/unistd.h:
 
 /usr/include/sys/unistd.h:
@@ -562,6 +559,10 @@ telseq.h:
 /usr/include/sys/_types/_uuid_t.h:
 
 /usr/include/gethostuuid.h:
+
+telseq.h:
+
+/usr/include/getopt.h:
 
 ../config.h:
 
