@@ -75,6 +75,7 @@ bamlist should contain only 1 column with each row the path of a BAM. i.e.
 ---------------------------
 > cat bamlist | telseq
 
+
 # output
 ---------------------------
 By default the result will be printed out to stdout. To change it to a file, use '-o'
@@ -90,6 +91,11 @@ The software will print out running status to stderr as well. To separate them f
 could direct log to a file, ie. 
 
 > telseq a.bam b.bam c.bam 2>outputlog
+
+Merge results from read groups by taking a weighted mean. However, it is benetifical run without
+-m to output the result per lane, so to have an idea about inter-lane variation. The merging
+can be done afterwards.
+> telseq -m a.bam > output
 
 
 
@@ -127,6 +133,7 @@ wish the output to be merged together. i.e.
 To just print out the header, use '-h' option. i.e. 
 
 > telseq -h
+
 
 
 

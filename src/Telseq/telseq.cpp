@@ -242,7 +242,7 @@ int scanBam()
 
             resultmap[tag].numTotal +=1;
 
-            if(!record1.IsMapped())
+            if(record1.IsMapped())
             {
             	resultmap[tag].numMapped += 1;
             }
