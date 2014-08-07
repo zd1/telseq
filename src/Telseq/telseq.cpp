@@ -51,10 +51,14 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "   -u                       ignore read groups. Treat all reads in BAM as if they were from a same read group.\n"
 "   -k                       threshold of the amount of TTAGGG/CCCTAA repeats in read for a read to be considered telomeric. default = 7.\n"
 "\nTesting functions\n------------\n"
-"   -z                       use user specified pattern for searching.\n"
+"   -r                       read length. default = 100\n"
+"   -z                       use user specified pattern for searching [ATGC]*.\n"
 "   -e, --exomebed=STR       specifiy exome regions in the BED format. These regions will be excluded when \n"
+"   -w,                      consider BAMs in the speicfied bamlist as one single BAM. This is useful when \n"
+"                            the initial alignemt is separated for some reason, such as into two files for \n"
+"                            mapped and ummapped reads. \n"
 "                            calculating estimates, thus an estimate of the absolute length can be obtained, \n"
-"                            same as that for the whole genome sequence BAMs.\n"
+"                            same as for the whole genome sequence BAMs.\n"
 "   --help                   display this help and exit\n"
 
 "\nReport bugs to " PACKAGE_BUGREPORT "\n\n";
@@ -68,14 +72,15 @@ namespace opt
     static bool writerheader = true;
     static bool mergerg = false;
     static bool ignorerg = false;
+    static bool onebam = false; // whether to consider all bams as one bam
     static int tel_k= ScanParameters::TEL_MOTIF_CUTOFF;
     static std::string unknown = "UNKNOWN";
-    static std::string PATTERN=ScanParameters::PATTERN;
-    static std::string PATTERN_REV=ScanParameters::PATTERN_REVCOMP;
+    static std::string PATTERN;
+    static std::string PATTERN_REV;
 
 }
 
-static const char* shortopts = "f:o:k:z:e:Hhvmu";
+static const char* shortopts = "f:o:k:z:e:r:p:Hhvmuw";
 
 enum { OPT_HELP = 1, OPT_VERSION };
 
@@ -88,6 +93,47 @@ static const struct option longopts[] = {
     { NULL, 0, NULL, 0 }
 };
 
+// combine counts in two ScanResults objects
+ScanResults add_results(ScanResults x, ScanResults y){
+    x.numTotal += y.numTotal;
+    x.numMapped += y.numMapped;
+    x.numDuplicates += y.numMapped;
+    x.n_exreadsExcluded += y.n_exreadsExcluded;
+    x.n_exreadsChrUnmatched += y.n_exreadsChrUnmatched;
+    x.n_totalunfiltered += y.n_totalunfiltered;
+    
+    for (std::size_t j = 0, max = x.telcounts.size(); j != max; ++j){
+        x.telcounts[j] +=y.telcounts[j];
+    }
+    for (std::size_t k = 0, max = x.gccounts.size(); k != max; ++k){
+        x.gccounts[k] += y.gccounts[k];
+    }
+    return x;
+}
+
+// merge results in result list into one
+std::vector< std::map<std::string, ScanResults> > merge_results_by_readgroup(std::vector< std::map<std::string, ScanResults> > resultlist){
+
+    std::vector< std::map<std::string, ScanResults> > mergedresultslist;
+    std::map<std::string, ScanResults> mergedresults;
+
+    for(size_t i =0; i< resultlist.size(); i++){
+        auto rmap = resultlist[i];
+        for(std::map<std::string, ScanResults>::iterator it= rmap.begin();
+                it != rmap.end(); ++it){
+            
+            std::string rg = it ->first;
+            ScanResults result = it -> second;
+            if(mergedresults.find(rg) == mergedresults.end()){
+                mergedresults[rg] = result;
+            }else{
+                mergedresults[rg]=add_results(mergedresults[rg], result);
+            }
+        }   
+    }
+    mergedresultslist.push_back(mergedresults);
+    return mergedresultslist;
+}
 
 
 int scanBam()
@@ -96,16 +142,15 @@ int scanBam()
 	std::vector< std::map<std::string, ScanResults> > resultlist;
 //	std::ostream* pWriter;
 //	pWriter = &std::cout;
-	bool isExome = opt::exomebedfile.size()==0? false: true;
-	
-	std::cout << opt::bamlist << "\n";
-	
+    bool isExome = opt::exomebedfile.size()==0? false: true;
+
+    std::cout << opt::bamlist << "\n";
+
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
         // storing results for each read group (RG tag). use
         // read group ID as key.
         std::map<std::string, ScanResults> resultmap;
-
         // store where the overlap was last found in the case of exome seq
     	std::map<std::string, std::vector<range>::iterator> lastfound;
     	std::vector<range>::iterator searchhint;
@@ -134,8 +179,6 @@ int scanBam()
         	results.sample = opt::unknown;
         	resultmap[opt::unknown]=results;
         }else{
-
-
 			std::map <std::string, std::string> readgroups;
 			std::map <std::string, std::string> readlibs;
 
@@ -275,9 +318,7 @@ int scanBam()
 
             if( nprocessed%10000000 == 0){
             	std::cerr << "[scan] processed " << nprocessed << " reads \n" ;
-                
             }
-            
         }
         
 		pBamReader->Close();
@@ -286,9 +327,14 @@ int scanBam()
         std::cerr << "[scan] total reads in BAM scanned " << ntotal << std::endl;
         std::cerr << "Completed scanning BAM\n";
 	    
+        // consider each BAM separately
         resultlist.push_back(resultmap);
     }
 
+    if(opt::onebam){
+        resultlist=merge_results_by_readgroup(resultlist);
+    }
+    
     outputresults(resultlist);
     if(isExome){
     	printlog(resultlist);
@@ -495,6 +541,19 @@ double calcGC(const std::string& seq)
     return num_gc / num_total;
 }
 
+void update_pattern(){
+
+	opt::PATTERN = ScanParameters::PATTERN;
+	opt::PATTERN_REV = ScanParameters::PATTERN_REVCOMP;
+
+    // update total motif counts when read length and/or pattern have been specified by user
+    ScanParameters::TEL_MOTIF_N = ScanParameters::READ_LENGTH/ScanParameters::PATTERN.size() +1;
+	if(opt::tel_k < 1 or opt::tel_k > ScanParameters::TEL_MOTIF_N-1){
+		std::cerr << "k out of bound. k must be an integer from 1 to " <<  ScanParameters::TEL_MOTIF_N-1 << "\n";
+		exit(EXIT_FAILURE);
+	}
+
+}
 
 
 //
@@ -522,6 +581,8 @@ void parseScanOptions(int argc, char** argv)
                 opt::mergerg = true; break;
             case 'u':
                 opt::ignorerg = true; break;
+            case 'w':
+                opt::onebam = true; break;
             case 'h':
         		for(size_t h=0; h<hd.headers.size();h++){
         			std::cout << hd.headers[h] << ScanParameters::FIELD_SEP;
@@ -530,19 +591,23 @@ void parseScanOptions(int argc, char** argv)
         		exit(EXIT_SUCCESS);
             case 'k':
             	arg >> opt::tel_k;
-            	if(opt::tel_k < 1 or opt::tel_k > ScanParameters::TEL_MOTIF_N-1){
-            		std::cerr << "k out of bound. k must be an integer from 1 to " <<  ScanParameters::TEL_MOTIF_N-1 << "\n";
-            		exit(EXIT_FAILURE);
-            	}
             	break;
-            case 'z':
-            	arg >> opt::PATTERN;
-            	for(size_t i=0;i<opt::PATTERN.size();i++){
-            		rev += complement(opt::PATTERN[i]);
-            	}
-            	opt::PATTERN_REV =  rev;
-            	break;
+            case 'r':
+				arg >> ScanParameters::READ_LENGTH;
+				if(ScanParameters::READ_LENGTH <= 0 || ScanParameters::READ_LENGTH > 100000){
+					std::cerr << "please specify valid read length that is greater than 0 and length than 100kb" << "\n";
+					exit(EXIT_FAILURE);
+				}
+				break;
+            case 'p':
 
+				break;
+            case 'z':
+            	arg >> ScanParameters::PATTERN;
+				ScanParameters::PATTERN_REVCOMP = reverseComplement(ScanParameters::PATTERN);
+				std::cerr << "use user specified pattern " <<  ScanParameters::PATTERN << "\n";
+				std::cerr << "reverse complement " <<  ScanParameters::PATTERN_REVCOMP << "\n";
+            	break;
             case 'e':
             	arg >> opt::exomebedfile;
             	opt::exomebed = readBedAsVector(opt::exomebedfile);
@@ -558,6 +623,8 @@ void parseScanOptions(int argc, char** argv)
                 exit(EXIT_SUCCESS);
         }
     }
+
+    update_pattern();
 
     // deal with cases of API usage:
     // telseq a.bam b.bam c.bam ...

@@ -22,15 +22,13 @@
 //
 typedef std::vector<std::string> StringVector;
 
-
-
 namespace ScanParameters{
 
 	static std::string FIELD_SEP="\t";
 	const unsigned int GENOME_LENGTH_AT_TEL_GC =  332720800;
-	const unsigned int READ_LENGTH=100;
-	const std::string PATTERN="TTAGGG";
-	const std::string PATTERN_REVCOMP="CCCTAA";
+	static unsigned int READ_LENGTH=100;
+	static std::string PATTERN="TTAGGG";
+	static std::string PATTERN_REVCOMP="CCCTAA";
 	const float GC_LOWERBOUND = 0.4;
 	const float GC_UPPERBOUND = 0.6;
 	const float GC_BINSIZE = 0.02;
@@ -39,7 +37,7 @@ namespace ScanParameters{
 	const float GC_TELOMERIC_UPPERBOUND = 0.52;
 
 	// maximum motif counts. add 1 to include 0 count.
-	const int TEL_MOTIF_N = READ_LENGTH/PATTERN.size() +1;
+	static int TEL_MOTIF_N = READ_LENGTH/PATTERN.size() +1;
 	const int TEL_MOTIF_CUTOFF = 7;
 	const int GC_BIN_N = (int) ((GC_UPPERBOUND-GC_LOWERBOUND)/GC_BINSIZE+0.5);
 
@@ -60,6 +58,21 @@ namespace ScanParameters{
 
 struct ScanResults
 {
+	std::string sample;
+	std::string lib;
+	std::string bam;
+	std::vector<int> telcounts;
+	std::vector<int> gccounts;
+	unsigned int numTotal;
+	unsigned int numMapped;
+	unsigned int numDuplicates;
+	double telLenEstimate;
+
+	// logging data
+	unsigned int n_totalunfiltered = 0;
+	unsigned int n_exreadsExcluded = 0;
+	unsigned int n_exreadsChrUnmatched=0;
+
 	ScanResults() { setDefaults(); }
 
     // Set reasonable default values for the qc filters
@@ -75,21 +88,8 @@ struct ScanResults
         n_exreadsChrUnmatched=0;
         n_totalunfiltered = 0;
     }
-	std::string sample;
-	std::string lib;
-	std::string bam;
-	std::vector<int> telcounts;
-	std::vector<int> gccounts;
-	unsigned int numTotal;
-	unsigned int numMapped;
-	unsigned int numDuplicates;
-	double telLenEstimate;
-
-	// logging data
-	unsigned int n_totalunfiltered = 0;
-    unsigned int n_exreadsExcluded = 0;
-	unsigned int n_exreadsChrUnmatched=0;
     
+
 };
 
 // headers for the output
@@ -133,25 +133,5 @@ void printout(std::string, ScanResults, std::ostream*);
 //std::ifstream::pos_type getFilesize(const std::string& filename);
 //std::istream* createReader(const std::string& filename);
 //std::ostream* createWriter(const std::string& filename);
-
-// Complement a base
-inline char complement(char base)
-{
-    switch(base)
-    {
-        case 'A':
-            return 'T';
-        case 'C':
-            return 'G';
-        case 'G':
-            return 'C';
-        case 'T':
-            return 'A';
-        case 'N':
-            return 'N';
-        default:
-            return 'N';
-    }
-}
 
 #endif /* TELSEQ_H_ */

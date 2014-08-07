@@ -13,6 +13,7 @@
 #include <fstream>
 #include <istream>
 #include <sstream>
+#include <cassert>
 #include <set>
 
 typedef std::pair<unsigned int, unsigned int> range;
@@ -39,6 +40,8 @@ std::ifstream::pos_type getFilesize(const std::string& filename);
 std::istream* createReader(const std::string& filename);
 std::ostream* createWriter(const std::string& filename);
 
+std::string reverseComplement(const std::string& seq);
+
 //std::set<range>::iterator searchRange(std::set<range>::iterator startit, std::set<range>::iterator endit, range r);
 //std::map< std::string, std::set<range> > readBedAsMap(std::string filename);
 std::vector<range>::iterator searchRange(std::vector<range>::iterator startit, std::vector<range>::iterator endit, range r);
@@ -56,6 +59,28 @@ inline static std::string refID2Name(int refid)
     	return "-1";
     }
 }
+
+// Complement a base
+inline char complement(char base)
+{
+    switch(base)
+    {
+        case 'A':
+            return 'T';
+        case 'C':
+            return 'G';
+        case 'G':
+            return 'C';
+        case 'T':
+            return 'A';
+        case 'N':
+            return 'N';
+        default:
+            assert(false && "Unknown base!");
+            return 'N';
+    }
+}
+
 
 
 #endif /* UTIL_H_ */
