@@ -11,7 +11,7 @@ Citation:
 
 _Estimating telomere length from whole genome sequence data_
 
-Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin. 
+Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin.  
 Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
 [http://nar.oxfordjournals.org/content/42/9/e75](http://nar.oxfordjournals.org/content/42/9/e75)
 
