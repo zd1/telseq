@@ -89,28 +89,25 @@ Merge results from read groups by taking a weighted mean. However, it is benetif
 can be done afterwards.
 `telseq -m a.bam > output`
 
-
-
 #### Output file format
 
-column definations
-| Column | Definitions |
-|---------|---------------|
-|ReadGroup| read group, Defined by the RG tag in BAM header. |
-|Library| sequencing library that the read group belongs to.|
-|Sample|defined by the SM tag in BAM header. |
-|Total|total number of reads in this read group. |
-|Mapped|total number of mapped reads, SAM flag 0x4. |
-|Duplicates| total number of duplicate reads, SAM flag 0x400. |
-|LENGH_ESTIMATE| estimated telomere length. |
-|TEL0| read counts for reads containing no TTAGGG/CCCTAA repeats. |
-|TEL1| read counts for reads containing only 1 TTAGGG/CCCTAA repeats. |
-|TELn| read counts for reads containing only n TTAGGG/CCCTAA repeats. |
-|TEL16| read counts for reads containing 16 TTAGGG/CCCTAA repeats. |
-|GC0| read counts for reads with GC between 40%-42%.|
-|GC1| read counts for reads with GC between 42%-44%.|
-|GCn| read counts for reads with GC between (40%+n*2%)-(42%+(n+1)*2%).|
-|GC9| read counts for reads with GC between 58%-60%. |
+|  Column | Definitions |
+| -------------|----------------------------------------------|
+| ReadGroup | read group, Defined by the RG tag in BAM header. |
+| Library   | sequencing library that the read group belongs to.|
+| Sample    | defined by the SM tag in BAM header. |
+| Total     | total number of reads in this read group. |
+| Mapped    | total number of mapped reads, SAM flag 0x4. |
+| Duplicates | total number of duplicate reads, SAM flag 0x400. |
+| LENGH_ESTIMATE | estimated telomere length. |
+| TEL0 | read counts for reads containing no TTAGGG/CCCTAA repeats. |
+| TEL1 | read counts for reads containing only 1 TTAGGG/CCCTAA repeats. |
+| TELn | read counts for reads containing only n TTAGGG/CCCTAA repeats. |
+| TEL16 | read counts for reads containing 16 TTAGGG/CCCTAA repeats. |
+| GC0 | read counts for reads with GC between 40%-42%. |
+| GC1 | read counts for reads with GC between 42%-44%. |
+| GCn | read counts for reads with GC between (40%+n*2%)-(42%+(n+1)*2%). |
+| GC9 | read counts for reads with GC between 58%-60%.  |
 
 By default for each BAM a header line will be printed out. This can be suppressed by using the '-H' option. It is useful when one has multiple BAMs to scan and wish the output to be merged together. i.e. 
 
