@@ -95,8 +95,8 @@ can be done afterwards.
 
 column definations
 | Column | Definitions |
-|:------- |:--------------|
-|ReadGroup|  read group the result is corresponding to. Defined by the RG tag in BAM header. |
+|:--------|:--------------|
+|ReadGroup| read group the result is corresponding to. Defined by the RG tag in BAM header. |
 |Library| sequencing library that the read group belongs to.|
 |Sample|defined by the SM tag in BAM header. |
 |Total|total number of reads in this read group. |
