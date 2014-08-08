@@ -254,14 +254,13 @@ int scanBam()
 				if(chrm != "-1"){ // check if overlap exome when the read is mapped to chr1-22, X, Y
 					// std::cerr << "read: " << chrm << " " << rg << "\n" << std::endl;
 					std::map<std::string, std::vector<range> >::iterator chrmit = opt::exomebed.find(chrm);
-
 					if(chrmit == opt::exomebed.end())
 					{
-						std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file." <<std::endl;
-						std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1" << std::endl;
-						resultmap[tag].n_exreadsChrUnmatched +=1;
+						// std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file." <<std::endl;
+						// std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1" << std::endl;
+                        // unmapped reads can have chr names as a star (*). We also don't consider MT reads. 
+						resultmap[tag].n_exreadsChrUnmatched +=1; 
 					}else{
-
 						std::vector<range>::iterator itend = opt::exomebed[chrm].end();
 						std::map<std::string, std::vector<range>::iterator>::iterator lastfoundchrmit = lastfound.find(chrm);
 						if(lastfoundchrmit == lastfound.end()){ // first entry to this chrm
@@ -351,10 +350,9 @@ void printlog(std::vector< std::map<std::string, ScanResults> > resultlist){
 			
 			std::string rg = it ->first;
 			ScanResults result = it -> second;
-
-			std::cerr << "BAM:" << rg << std::endl;
-			std::cerr << "	chr ID unmatched reads: " << result.n_exreadsChrUnmatched << std::endl;
-			std::cerr << "	exome reads excluded: " << result.n_exreadsExcluded << std::endl;
+			std::cout << "BAM:" << rg << std::endl;
+			std::cout << "	chr ID unmatched reads: " << result.n_exreadsChrUnmatched << std::endl;
+			std::cout << "	exome reads excluded: " << result.n_exreadsExcluded << std::endl;
 		}	
 	}
 
