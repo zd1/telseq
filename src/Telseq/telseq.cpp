@@ -308,11 +308,11 @@ int scanBam()
             	}
             	resultmap[tag].gccounts[idx]+=1;
             }
-            
-            if(resultmap[tag].n_exreadsChrUnmatched > 1000){
-            	std::cerr<<"too many reads found with unmatched chromosome ID between BAM and exome BED. \n" << std::endl;
-            }
-            
+
+            // if(resultmap[tag].n_exreadsChrUnmatched > 1000){
+            // 	std::cerr<<"too many reads found with unmatched chromosome ID between BAM and exome BED. \n" << std::endl;
+            // }
+
             nprocessed++;
 
             if( nprocessed%10000000 == 0){
