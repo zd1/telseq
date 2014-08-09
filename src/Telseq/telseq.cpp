@@ -94,7 +94,7 @@ static const struct option longopts[] = {
 };
 
 // combine counts in two ScanResults objects
-ScanResults add_results(ScanResults x, ScanResults y){
+void add_results(ScanResults& x, ScanResults& y){
     x.numTotal += y.numTotal;
     x.numMapped += y.numMapped;
     x.numDuplicates += y.numMapped;
@@ -108,11 +108,11 @@ ScanResults add_results(ScanResults x, ScanResults y){
     for (std::size_t k = 0, max = x.gccounts.size(); k != max; ++k){
         x.gccounts[k] += y.gccounts[k];
     }
-    return x;
 }
 
 // merge results in result list into one
-std::vector< std::map<std::string, ScanResults> > merge_results_by_readgroup(std::vector< std::map<std::string, ScanResults> > resultlist){
+void merge_results_by_readgroup(
+    std::vector< std::map<std::string, ScanResults> >& resultlist){
 
     std::vector< std::map<std::string, ScanResults> > mergedresultslist;
     std::map<std::string, ScanResults> mergedresults;
@@ -127,12 +127,13 @@ std::vector< std::map<std::string, ScanResults> > merge_results_by_readgroup(std
             if(mergedresults.find(rg) == mergedresults.end()){
                 mergedresults[rg] = result;
             }else{
-                mergedresults[rg]=add_results(mergedresults[rg], result);
+                add_results(mergedresults[rg], result);
             }
         }   
     }
     mergedresultslist.push_back(mergedresults);
-    return mergedresultslist;
+    resultlist = mergedresultslist;
+
 }
 
 
@@ -331,7 +332,7 @@ int scanBam()
     }
 
     if(opt::onebam){
-        resultlist=merge_results_by_readgroup(resultlist);
+        merge_results_by_readgroup(resultlist);
     }
     
     outputresults(resultlist);
