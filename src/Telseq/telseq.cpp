@@ -147,6 +147,7 @@ int scanBam()
 
     std::cout << opt::bamlist << "\n";
 
+
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
         // storing results for each read group (RG tag). use

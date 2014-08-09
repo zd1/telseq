@@ -27,7 +27,7 @@ AC_ARG_WITH(bamtools,
 
 # Set compiler flags.
 #AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Werror -Wno-unknown-pragmas")
-AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Wno-unknown-pragmas")
+AC_SUBST(AM_CXXFLAGS, "-Wall -Wextra -Wno-unknown-pragmas -g -O0")
 #AC_SUBST(CXXFLAGS, "-O3")
 #AC_SUBST(CFLAGS, "-O3")
 
