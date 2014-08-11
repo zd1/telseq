@@ -95,6 +95,7 @@ static const struct option longopts[] = {
 
 // combine counts in two ScanResults objects
 void add_results(ScanResults& x, ScanResults& y){
+
     x.numTotal += y.numTotal;
     x.numMapped += y.numMapped;
     x.numDuplicates += y.numMapped;
@@ -108,12 +109,13 @@ void add_results(ScanResults& x, ScanResults& y){
     for (std::size_t k = 0, max = x.gccounts.size(); k != max; ++k){
         x.gccounts[k] += y.gccounts[k];
     }
+
 }
 
 // merge results in result list into one
 void merge_results_by_readgroup(
-    std::vector< std::map<std::string, ScanResults> >& resultlist){
 
+    std::vector< std::map<std::string, ScanResults> >& resultlist){
     std::vector< std::map<std::string, ScanResults> > mergedresultslist;
     std::map<std::string, ScanResults> mergedresults;
 
@@ -121,9 +123,10 @@ void merge_results_by_readgroup(
         auto rmap = resultlist[i];
         for(std::map<std::string, ScanResults>::iterator it= rmap.begin();
                 it != rmap.end(); ++it){
-            
+
             std::string rg = it ->first;
             ScanResults result = it -> second;
+
             if(mergedresults.find(rg) == mergedresults.end()){
                 mergedresults[rg] = result;
             }else{
@@ -146,7 +149,7 @@ int scanBam()
     bool isExome = opt::exomebedfile.size()==0? false: true;
 
     std::cout << opt::bamlist << "\n";
-
+    std::cout << opt::bamlist.size() << " BAMs" <<  std::endl;
 
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
 
@@ -296,7 +299,10 @@ int scanBam()
 
             double gc = calcGC(record1.QueryBases);
             int ptn_count = countMotif(record1.QueryBases, opt::PATTERN, opt::PATTERN_REV);
-
+            // when the read length exceeds 100bp, number of patterns might exceed the boundary
+            if (ptn_count > ScanParameters::TEL_MOTIF_N-1){
+                continue;
+            }
             resultmap[tag].telcounts[ptn_count]+=1;
 
             if(gc >= ScanParameters::GC_LOWERBOUND && gc <= ScanParameters::GC_UPPERBOUND){
@@ -325,11 +331,12 @@ int scanBam()
 		pBamReader->Close();
         delete pBamReader;
         
-        std::cerr << "[scan] total reads in BAM scanned " << ntotal << std::endl;
-        std::cerr << "Completed scanning BAM\n";
-	    
         // consider each BAM separately
         resultlist.push_back(resultmap);
+
+        std::cerr << "[scan] total reads in BAM scanned " << ntotal << std::endl;
+        std::cerr << "Completed scanning BAM\n";
+
     }
 
     if(opt::onebam){
@@ -337,9 +344,13 @@ int scanBam()
     }
     
     outputresults(resultlist);
+
     if(isExome){
     	printlog(resultlist);
     }
+    
+    std::cerr << "Completed writing results\n";
+
     return 0;
 }
 
