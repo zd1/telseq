@@ -24,11 +24,18 @@ Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
 - A modern version of GCC (version 4.8 or above)
 This can been seen by "gcc --version". 
 If multiple GCCs are installed in your system, please set environmental 
-variables pointing to the one of version 4.8 or above. i.e. in bash, 
+variables pointing to the one of version 4.8 or above. e.g. in bash, 
 
 ```
 export CXX=/path/to/gcc/gcc-4.8.1/bin/g++
 export CC=/path/to/gcc/gcc-4.8.1/bin/gcc
+```
+
+One easy way to install a new GCC is to use homebrew,
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install gcc
 ```
 
 ###Compile
