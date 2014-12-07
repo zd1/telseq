@@ -16,7 +16,7 @@ Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
 [http://nar.oxfordjournals.org/content/42/9/e75](http://nar.oxfordjournals.org/content/42/9/e75)
 
 
-## Compiling TelSeq
+## Compile TelSeq
 
 ###TelSeq dependency:
 - the bamtools library (https://github.com/pezmaster31/bamtools)
@@ -31,7 +31,7 @@ export CXX=/path/to/gcc/gcc-4.8.1/bin/g++
 export CC=/path/to/gcc/gcc-4.8.1/bin/gcc
 ```
 
-###Compiling
+###Compile
 Go to the src directory and run autogen.sh from the src directory to generate the configure file
 `./autogen.sh`
 Then run
