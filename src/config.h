@@ -32,7 +32,7 @@
 #define PACKAGE "telseq"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "zd1@sanger.ac.uk"
+#define PACKAGE_BUGREPORT "zhihao.ding@imm.ox.ac.uk"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "TelSeq"

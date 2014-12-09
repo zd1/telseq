@@ -34,9 +34,13 @@ export CC=/path/to/gcc/gcc-4.8.1/bin/gcc
 One easy way to install a new GCC is to use homebrew,
 
 ```
+# install homebrew if you don't have it
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# install GCC
 brew install gcc
 ```
+
 
 ###Compile
 Go to the src directory and run autogen.sh from the src directory to generate the configure file
@@ -125,7 +129,9 @@ To just print out the header, use '-h' option. i.e.
 
 `telseq -h`
 
-
+###Contact
+=============================
+zhihao.ding at imm.ox.ac.uk
 
 
 
