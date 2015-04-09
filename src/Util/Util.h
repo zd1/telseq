@@ -8,7 +8,6 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-
 #include <iostream>
 #include <fstream>
 #include <istream>
@@ -42,10 +41,6 @@ std::ostream* createWriter(const std::string& filename);
 
 std::string reverseComplement(const std::string& seq);
 
-//std::set<range>::iterator searchRange(std::set<range>::iterator startit, std::set<range>::iterator endit, range r);
-//std::map< std::string, std::set<range> > readBedAsMap(std::string filename);
-std::vector<range>::iterator searchRange(std::vector<range>::iterator startit, std::vector<range>::iterator endit, range r);
-std::map< std::string, std::vector<range> > readBedAsVector(std::string filename);
 
 inline static std::string refID2Name(int refid)
 {	

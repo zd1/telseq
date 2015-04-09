@@ -17,7 +17,7 @@
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 #include "Util.h"
-#include "prettyprint.h"
+
 
 //
 // Getopt
@@ -39,7 +39,7 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "Scan BAM and estimate telomere length. \n"
 "   <in.bam>                 one or more BAM files to be analysed. File names can also be passed from a pipe, \n "
 "                            with each row containing one BAM path.\n"
-"   -f, --bamlist=STR        a file that contains a list of file paths of BAMs. It should has only one column, \n"
+"   -f, --bamlist=STR        a file that contains a list of file paths of BAMs. It should have only one column, \n"
 "                            with each row a BAM file path. -f has higher priority than <in.bam>. When specified, \n"
 "                            <in.bam> are ignored.\n"
 "   -o, --output_dir=STR     output file for results. Ignored when input is from stdin, in which case output will be stdout. \n"
@@ -53,7 +53,6 @@ static const char *TELSEQ_USAGE_MESSAGE =
 "\nTesting functions\n------------\n"
 "   -r                       read length. default = 100\n"
 "   -z                       use user specified pattern for searching [ATGC]*.\n"
-"   -e, --exomebed=STR       specifiy exome regions in BED format. These regions will be excluded \n"
 "   -w,                      consider BAMs in the speicfied bamlist as one single BAM. This is useful when \n"
 "                            the initial alignemt is separated for some reason, such as one for mapped and one for ummapped reads. \n"
 "   --help                   display this help and exit\n"
@@ -64,8 +63,6 @@ namespace opt
 {
     static StringVector bamlist;
     static std::string outputfile = "";
-    static std::string exomebedfile = "";
-    static std::map< std::string, std::vector<range> > exomebed;
     static bool writerheader = true;
     static bool mergerg = false;
     static bool ignorerg = false;
@@ -84,7 +81,6 @@ enum { OPT_HELP = 1, OPT_VERSION };
 static const struct option longopts[] = {
 	{ "bamlist",		optional_argument, NULL, 'f' },
     { "output-dir",		optional_argument, NULL, 'o' },
-    { "exomebed",		optional_argument, NULL, 'e' },
     { "help",               no_argument,       NULL, OPT_HELP },
     { "version",            no_argument,       NULL, OPT_VERSION },
     { NULL, 0, NULL, 0 }
@@ -143,9 +139,7 @@ int scanBam()
 	std::vector< std::map<std::string, ScanResults> > resultlist;
 //	std::ostream* pWriter;
 //	pWriter = &std::cout;
-    bool isExome = opt::exomebedfile.size()==0? false: true;
 
-    std::cout << opt::bamlist << "\n";
     std::cout << opt::bamlist.size() << " BAMs" <<  std::endl;
 
     for(std::size_t i=0; i<opt::bamlist.size(); i++) {
@@ -245,45 +239,7 @@ int scanBam()
 				std::cerr << "{" << record1.RefID << ":" << record1.Position << "} doesn't exist in BAM header.";
 				continue;
             }
-
-            // for exome, exclude reads mapped to the exome regions.
-            if(isExome){
-				range rg;
-				rg.first = record1.Position;
-				rg.second = record1.Position + record1.Length;
-				std::string chrm =  refID2Name(record1.RefID);
-
-				if(chrm != "-1"){ // check if overlap exome when the read is mapped to chr1-22, X, Y
-					// std::cerr << "read: " << chrm << " " << rg << "\n" << std::endl;
-					std::map<std::string, std::vector<range> >::iterator chrmit = opt::exomebed.find(chrm);
-					if(chrmit == opt::exomebed.end())
-					{
-						// std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file." <<std::endl;
-						// std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1" << std::endl;
-                        // unmapped reads can have chr names as a star (*). We also don't consider MT reads. 
-						resultmap[tag].n_exreadsChrUnmatched +=1; 
-					}else{
-						std::vector<range>::iterator itend = opt::exomebed[chrm].end();
-						std::map<std::string, std::vector<range>::iterator>::iterator lastfoundchrmit = lastfound.find(chrm);
-						if(lastfoundchrmit == lastfound.end()){ // first entry to this chrm
-							lastfound[chrm] = chrmit->second.begin();// start from begining
-						}
-
-						// set the hint to where the previous found is
-						searchhint = lastfound[chrm];
-						std::vector<range>::iterator itsearch = searchRange(searchhint, itend, rg);
-						// if found
-						if(itsearch != itend){// if found
-							searchhint = itsearch;
-							resultmap[tag].n_exreadsExcluded +=1;
-							lastfound[chrm] = searchhint; // update search hint
-							continue;
-						}
-					}
-
-				}
-            }
-
+	    
             resultmap[tag].numTotal +=1;
 
             if(record1.IsMapped())
@@ -341,10 +297,6 @@ int scanBam()
     }
     
     outputresults(resultlist);
-
-    if(isExome){
-    	printlog(resultlist);
-    }
     
     std::cerr << "Completed writing results\n";
 
@@ -362,7 +314,6 @@ void printlog(std::vector< std::map<std::string, ScanResults> > resultlist){
 			ScanResults result = it -> second;
 			std::cout << "BAM:" << rg << std::endl;
 			std::cout << "	chr ID unmatched reads: " << result.n_exreadsChrUnmatched << std::endl;
-			std::cout << "	exome reads excluded: " << result.n_exreadsExcluded << std::endl;
 		}	
 	}
 
@@ -616,13 +567,6 @@ void parseScanOptions(int argc, char** argv)
 				std::cerr << "use user specified pattern " <<  ScanParameters::PATTERN << "\n";
 				std::cerr << "reverse complement " <<  ScanParameters::PATTERN_REVCOMP << "\n";
             	break;
-            case 'e':
-            	arg >> opt::exomebedfile;
-            	opt::exomebed = readBedAsVector(opt::exomebedfile);
-            	std::cout << "loaded "<< opt::exomebed.size() << " exome regions \n"<< std::endl;
-//            	std::cout << opt::exomebed << "\n";
-            	break;
-
             case OPT_HELP:
                 std::cout << TELSEQ_USAGE_MESSAGE;
                 exit(EXIT_SUCCESS);
@@ -711,11 +655,11 @@ void parseScanOptions(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-	Timer* pTimer = new Timer("scan BAM");
-	parseScanOptions(argc, argv);
-    scanBam();
-    delete pTimer;
-    return 0;
+  Timer* pTimer = new Timer("scan BAM");
+  parseScanOptions(argc, argv);
+  scanBam();
+  delete pTimer;
+  return 0;
 }
 
 
