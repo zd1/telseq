@@ -131,7 +131,7 @@ To just print out the header, use '-h' option. i.e.
 
 ###Contact
 =============================
-zhihao.ding at imm.ox.ac.uk
+zhihao.ding at gmail.com
 
 
 
