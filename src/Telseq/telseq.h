@@ -29,6 +29,7 @@ namespace ScanParameters{
 	static unsigned int READ_LENGTH=100;
 	static std::string PATTERN="TTAGGG";
 	static std::string PATTERN_REVCOMP="CCCTAA";
+	const int TELOMERE_ENDS = 46;
 	const float GC_LOWERBOUND = 0.4;
 	const float GC_UPPERBOUND = 0.6;
 	const float GC_BINSIZE = 0.02;
@@ -88,7 +89,7 @@ struct ScanResults
         n_exreadsChrUnmatched=0;
         n_totalunfiltered = 0;
     }
-    
+
 
 };
 

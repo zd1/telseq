@@ -99,7 +99,7 @@ void add_results(ScanResults& x, ScanResults& y){
     x.n_exreadsExcluded += y.n_exreadsExcluded;
     x.n_exreadsChrUnmatched += y.n_exreadsChrUnmatched;
     x.n_totalunfiltered += y.n_totalunfiltered;
-    
+
     for (std::size_t j = 0, max = x.telcounts.size(); j != max; ++j){
         x.telcounts[j] +=y.telcounts[j];
     }
@@ -129,7 +129,7 @@ void merge_results_by_readgroup(
             }else{
                 add_results(mergedresults[rg], result);
             }
-        }   
+        }
     }
     mergedresultslist.push_back(mergedresults);
     resultlist = mergedresultslist;
@@ -156,7 +156,7 @@ int scanBam()
         // store where the overlap was last found in the case of exome seq
     	std::map<std::string, std::vector<range>::iterator> lastfound;
     	std::vector<range>::iterator searchhint;
-        
+
         std::cerr << "Start analysing BAM " << opt::bamlist[i] << "\n";
 
         // Open the bam files for reading/writing
@@ -174,7 +174,7 @@ int scanBam()
 //        exit(0);
 
         bool rggroups=false;
-        
+
         if(opt::ignorerg){ // ignore read groups
         	std::cerr << "Treat all reads in BAM as if they were from a same sample" << std::endl;
         	ScanResults results;
@@ -218,7 +218,7 @@ int scanBam()
 
         BamTools::BamAlignment record1;
         bool done = false;
-        
+
         int nprocessed=0; // number of reads analyzed
         int ntotal=0; // number of reads scanned in bam (we skip some reads, see below)
         while(!done)
@@ -227,7 +227,7 @@ int scanBam()
             done = !pBamReader -> GetNextAlignment(record1);
             std::string tag = opt::unknown;
             if(rggroups){
-                
+
                 // skip reads that do not have read group tag
             	if(record1.HasTag("RG")){
 					record1.GetTag("RG", tag);
@@ -238,7 +238,7 @@ int scanBam()
 					continue;
 				}
             }
-            
+
             // skip reads with readgroup not defined in BAM header
             if(resultmap.find(tag) == resultmap.end()){
 				std::cerr << "RG tag {" << tag << "} for read at position ";
@@ -260,8 +260,8 @@ int scanBam()
 					{
 						// std::cerr<<"chromosome or reference sequence: " << chrm << " is not present in the specified exome bed file." <<std::endl;
 						// std::cerr<<"please check sequence name encoding, i.e. for chromosome one, is it chr1 or 1" << std::endl;
-                        // unmapped reads can have chr names as a star (*). We also don't consider MT reads. 
-						resultmap[tag].n_exreadsChrUnmatched +=1; 
+                        // unmapped reads can have chr names as a star (*). We also don't consider MT reads.
+						resultmap[tag].n_exreadsChrUnmatched +=1;
 					}else{
 						std::vector<range>::iterator itend = opt::exomebed[chrm].end();
 						std::map<std::string, std::vector<range>::iterator>::iterator lastfoundchrmit = lastfound.find(chrm);
@@ -324,10 +324,10 @@ int scanBam()
             	std::cerr << "[scan] processed " << nprocessed << " reads \n" ;
             }
         }
-        
+
 		pBamReader->Close();
         delete pBamReader;
-        
+
         // consider each BAM separately
         resultlist.push_back(resultmap);
 
@@ -339,13 +339,13 @@ int scanBam()
     if(opt::onebam){
         merge_results_by_readgroup(resultlist);
     }
-    
+
     outputresults(resultlist);
 
     if(isExome){
     	printlog(resultlist);
     }
-    
+
     std::cerr << "Completed writing results\n";
 
     return 0;
@@ -357,13 +357,13 @@ void printlog(std::vector< std::map<std::string, ScanResults> > resultlist){
 		auto rmap = resultlist[i];
 		for(std::map<std::string, ScanResults>::iterator it= rmap.begin();
 				it != rmap.end(); ++it){
-			
+
 			std::string rg = it ->first;
 			ScanResults result = it -> second;
 			std::cout << "BAM:" << rg << std::endl;
 			std::cout << "	chr ID unmatched reads: " << result.n_exreadsChrUnmatched << std::endl;
 			std::cout << "	exome reads excluded: " << result.n_exreadsExcluded << std::endl;
-		}	
+		}
 	}
 
 }
@@ -508,7 +508,7 @@ double calcTelLength(ScanResults results){
 		return -1;
 	}
 
-	return (acc/gc_tel)*float(ScanParameters::GENOME_LENGTH_AT_TEL_GC)/46000;
+	return (acc/gc_tel)*float(ScanParameters::GENOME_LENGTH_AT_TEL_GC)/1000/ScanParameters::TELOMERE_ENDS;
 }
 
 
@@ -717,5 +717,3 @@ int main(int argc, char** argv)
     delete pTimer;
     return 0;
 }
-
-
