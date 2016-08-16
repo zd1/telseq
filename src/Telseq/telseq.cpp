@@ -672,16 +672,6 @@ void parseScanOptions(int argc, char** argv)
         }
         delete pReader;
     }
-
-    // check output
-//    for(size_t i = 0; i < opt::bamlist.size(); ++i ){
-//    	std::cerr << "opt::bamlist:" << opt::bamlist[i] << "\n";
-//    }
-//    std::cerr << "opt::bamlistfile:" << bamlistfile << "\n";
-//    std::cerr << "opt::writerheader:" << opt::writerheader << "\n";
-//    std::cerr << "opt::tel_k:" << opt::tel_k << "\n";
-//    std::cerr << "opt::outputdir:" << opt::outputfile << "\n";
-
 }
 
 
