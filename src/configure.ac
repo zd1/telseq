@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([TelSeq], [0.0.1], [zd1@sanger.ac.uk])
+AC_INIT([TelSeq], [0.0.1], [zhihao.ding@gmail.com])
 AM_INIT_AUTOMAKE(foreign)
 AC_CONFIG_SRCDIR([Telseq/telseq.cpp])
 AC_CONFIG_HEADERS([config.h])
@@ -22,7 +22,7 @@ AC_ARG_WITH(bamtools,
     		bamtools_include="-I$withval/include -I$withval/include/bamtools"
 		else
           	AC_MSG_ERROR([Cannot stat directory $withval])
-      	fi ] 
+      	fi ]
         )
 
 # Set compiler flags.
@@ -55,6 +55,3 @@ AC_CONFIG_FILES([Makefile
     Telseq/Makefile])
 
 AC_OUTPUT
-
-
-
