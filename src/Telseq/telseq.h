@@ -25,8 +25,11 @@ typedef std::vector<std::string> StringVector;
 namespace ScanParameters{
 
 	static std::string FIELD_SEP="\t";
+	// this is in basepair
 	const unsigned int GENOME_LENGTH_AT_TEL_GC =  332720800;
-	static unsigned int READ_LENGTH=100;
+	// output unit, it kb by default (1000), change it to 1 if in bp
+	const unsigned int LENGTH_UNIT = 1000;
+	static unsigned int READ_LENGTH = 100;
 	static std::string PATTERN="TTAGGG";
 	static std::string PATTERN_REVCOMP="CCCTAA";
 	const unsigned int TELOMERE_ENDS = 46;

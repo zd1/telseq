@@ -485,7 +485,7 @@ double calcTelLength(ScanResults results){
 		return -1;
 	}
 
-	return (acc/gc_tel)*float(ScanParameters::GENOME_LENGTH_AT_TEL_GC)/1000/ScanParameters::TELOMERE_ENDS;
+	return (acc/gc_tel)*float(ScanParameters::GENOME_LENGTH_AT_TEL_GC)/ScanParameters::LENGTH_UNIT/ScanParameters::TELOMERE_ENDS;
 }
 
 
