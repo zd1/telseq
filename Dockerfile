@@ -39,9 +39,9 @@ RUN mkdir -p /deps && \
 # build telseq
 RUN mkdir -p /src && \
     cd /src && \
-    wget https://github.com/zd1/telseq/archive/0.0.1.tar.gz && \
-    tar -xzvf 0.0.1.tar.gz && \
-    rm 0.0.1.tar.gz && \
+    wget https://github.com/zd1/telseq/archive/v0.0.1.tar.gz && \
+    tar -xzvf v0.0.1.tar.gz && \
+    rm v0.0.1.tar.gz && \
     cd telseq-0.0.1/src && \
     ./autogen.sh && \
     ./configure --with-bamtools=/deps/bamtools-2.4.0 --with-jemalloc=/usr --prefix=/usr/local && \
