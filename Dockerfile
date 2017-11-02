@@ -44,7 +44,7 @@ RUN mkdir -p /src && \
     rm v0.0.1.tar.gz && \
     cd telseq-0.0.1/src && \
     ./autogen.sh && \
-    ./configure --with-bamtools=/deps/bamtools-2.4.0 --with-jemalloc=/usr --prefix=/usr/local && \
+    ./configure --with-bamtools=/deps/bamtools-2.4.0 --prefix=/usr/local && \
     make && \
     make install
 
