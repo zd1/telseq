@@ -45,7 +45,8 @@ RUN mkdir -p /deps && \
     cmake .. && \
     make
 
-# build SGA
+
+# build telseq
 RUN mkdir -p /src && \
     cd /src && \
     wget https://github.com/zd1/telseq/archive/0.0.1.tar.gz && \
