@@ -134,7 +134,8 @@ To just print out the header, use '-h' option. i.e.
 
 ### Install Docker
 
-Please refer to the official website for installing Docker [https://docs.docker.com/engine/installation/][https://docs.docker.com/engine/installation/]
+Please refer to the official website for installing Docker
+[https://docs.docker.com/engine/installation/](https://docs.docker.com/engine/installation/)
 
 
 ### Build telseq Docker image
