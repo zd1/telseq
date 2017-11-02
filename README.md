@@ -1,30 +1,30 @@
-TelSeq is a software that estimates telomere length from 
-whole genome sequencing data (BAMs). 
+TelSeq is a software that estimates telomere length from
+whole genome sequencing data (BAMs).
 
 The most current development version is available from our
 git repository:
 [git://github.com/zd1/telseq.git](git://github.com/zd1/telseq.git)
 
-The software is implemented in C++. 
+The software is implemented in C++.
 
 Citation:
 
 _Estimating telomere length from whole genome sequence data_
 
-Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin.  
+Zhihao Ding; Massimo Mangino; Abraham Aviv; Tim Spector; Richard Durbin.
 Nucleic Acids Research 2014; doi: 10.1093/nar/gku181
 [http://nar.oxfordjournals.org/content/42/9/e75](http://nar.oxfordjournals.org/content/42/9/e75)
 
 
 ## Compile TelSeq
 
-###TelSeq dependency:
+### TelSeq dependency:
 - the bamtools library (https://github.com/pezmaster31/bamtools)
 
 - A modern version of GCC (version 4.8 or above)
-This can been seen by "gcc --version". 
-If multiple GCCs are installed in your system, please set environmental 
-variables pointing to the one of version 4.8 or above. e.g. in bash, 
+This can been seen by "gcc --version".
+If multiple GCCs are installed in your system, please set environmental
+variables pointing to the one of version 4.8 or above. e.g. in bash,
 
 ```
 export CXX=/path/to/gcc/gcc-4.8.1/bin/g++
@@ -42,34 +42,34 @@ brew install gcc
 ```
 
 
-###Compile
+### Compile
 Go to the src directory and run autogen.sh from the src directory to generate the configure file
 `./autogen.sh`
 Then run
 ```
-./configure 
+./configure
 make
 ```
 
 The executable binary will be at src/Telseq/telseq.
-If bamtools are installed not at the system location, you can 
-specify their location by 
+If bamtools are installed not at the system location, you can
+specify their location by
 
 `./configure  --with-bamtools=/path/to/bamtools`
 
-The /path/to/bamtools directory is the directory that contains 'lib' and 'include' sub directories. 
+The /path/to/bamtools directory is the directory that contains 'lib' and 'include' sub directories.
 
-###Running TelSeq
+## Run TelSeq
 =============================
 
-##### Read options and usage information 
+##### Read options and usage information
 `telseq`
 
 ##### Analyse one or more BAMs by specifying BAM file path as command line arguments.
 `telseq a.bam b.bam`
 
-##### Analyse a list of BAMs whose paths are specified in a 'bamlist' file. 
-bamlist should contain only 1 column with each row the path of a BAM. i.e. 
+##### Analyse a list of BAMs whose paths are specified in a 'bamlist' file.
+bamlist should contain only 1 column with each row the path of a BAM. i.e.
 
 ```
 /path/to/a.bam
@@ -77,7 +77,7 @@ bamlist should contain only 1 column with each row the path of a BAM. i.e.
 ```
 `telseq -f bamlist`
 
-##### BAM file path can also be provided by piping in a 'bamlist', whose format must be same as above 
+##### BAM file path can also be provided by piping in a 'bamlist', whose format must be same as above
 `cat bamlist | telseq`
 
 
@@ -91,8 +91,8 @@ This can also be achived by just direct the output to a file using '>', i.e.
 
 `telseq a.bam b.bam c.bam > /path/to/output`
 
-The software will print out running status to stderr as well. To separate them from stdout, one 
-could direct log to a file, ie. 
+The software will print out running status to stderr as well. To separate them from stdout, one
+could direct log to a file, ie.
 
 `telseq a.bam b.bam c.bam 2>outputlog`
 
@@ -121,38 +121,34 @@ can be done afterwards.
 | GCn | read counts for reads with GC between (40%+n*2%)-(42%+(n+1)*2%). |
 | GC9 | read counts for reads with GC between 58%-60%.  |
 
-By default for each BAM a header line will be printed out. This can be suppressed by using the '-H' option. It is useful when one has multiple BAMs to scan and wish the output to be merged together. i.e. 
+By default for each BAM a header line will be printed out. This can be suppressed by using the '-H' option. It is useful when one has multiple BAMs to scan and wish the output to be merged together. i.e.
 
 `telseq -H a.bam b.bam c.bam > myresult`
 
-To just print out the header, use '-h' option. i.e. 
+To just print out the header, use '-h' option. i.e.
 
 `telseq -h`
 
-###Contact
+## Docker
+=============================
+
+### Install Docker
+
+Please refer to the official website for installing Docker [https://docs.docker.com/engine/installation/][https://docs.docker.com/engine/installation/]
+
+
+### Build telseq Docker image
+
+```
+docker build -t telseq-docker github.com/zd1/telseq
+```
+
+### Run telseq
+
+```
+docker run telseq-docker
+```
+
+## Contact
 =============================
 zhihao.ding at gmail.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

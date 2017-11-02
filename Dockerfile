@@ -1,13 +1,3 @@
-# telseq docker
-#
-# To build:
-#
-# docker build -t telseq-docker github.com/zd1/telseq
-#
-# To run:
-#
-# docker run telseq-docker a.bam
-#
 
 FROM ubuntu:14.04
 MAINTAINER Zhihao Ding <zhihao.ding@gmail.com>
