@@ -60,7 +60,6 @@ specify their location by
 The /path/to/bamtools directory is the directory that contains 'lib' and 'include' sub directories.
 
 ## Run TelSeq
-=============================
 
 ##### Read options and usage information
 `telseq`
@@ -130,7 +129,6 @@ To just print out the header, use '-h' option. i.e.
 `telseq -h`
 
 ## Docker
-=============================
 
 ### Install Docker
 
@@ -151,5 +149,5 @@ docker run telseq-docker
 ```
 
 ## Contact
-=============================
+
 zhihao.ding at gmail.com
