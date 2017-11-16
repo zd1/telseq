@@ -144,8 +144,12 @@ docker build -t telseq-docker github.com/zd1/telseq
 
 ### Run telseq
 
+Note that the sample path "/path/to/bam/sample.bam" in the machine
+that the container is run needs to be specified. "/sample.bam" doesn't
+need to be changed.
+
 ```
-docker run telseq-docker
+docker run -v /path/to/bam/sample.bam:/sample.bam telseq-docker /sample.bam
 ```
 
 ## Contact

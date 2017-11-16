@@ -667,7 +667,7 @@ void parseScanOptions(int argc, char** argv)
 
         size_t bamsize = opt::bamlist.size();
         if(bamsize == 0 ){
-            std::cerr << PROGRAM_BIN ": Could find any sample in BAMLIST file specified.\n";
+            std::cerr << PROGRAM_BIN ": Could not find any sample in BAMLIST file specified.\n";
             exit(EXIT_FAILURE);
         }
         delete pReader;
