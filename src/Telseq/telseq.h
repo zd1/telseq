@@ -13,6 +13,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <cstdint>
 #include "config.h"
 #include "Util.h"
 
@@ -32,7 +33,7 @@ namespace ScanParameters{
 	static unsigned int READ_LENGTH = 100;
 	static std::string PATTERN="TTAGGG";
 	static std::string PATTERN_REVCOMP="CCCTAA";
-	const unsigned int TELOMERE_ENDS = 46;
+	const uint64_t TELOMERE_ENDS = 46;
 	const float GC_LOWERBOUND = 0.4;
 	const float GC_UPPERBOUND = 0.6;
 	const float GC_BINSIZE = 0.02;
@@ -41,8 +42,8 @@ namespace ScanParameters{
 	const float GC_TELOMERIC_UPPERBOUND = 0.52;
 
 	// maximum motif counts. add 1 to include 0 count.
-	static int TEL_MOTIF_N = READ_LENGTH/PATTERN.size() +1;
-	const int TEL_MOTIF_CUTOFF = 7;
+	static uint64_t TEL_MOTIF_N = READ_LENGTH/PATTERN.size() +1;
+	const uint64_t TEL_MOTIF_CUTOFF = 7;
 	const int GC_BIN_N = (int) ((GC_UPPERBOUND-GC_LOWERBOUND)/GC_BINSIZE+0.5);
 
 	const std::string LABEL_RG="ReadGroup";
@@ -65,25 +66,25 @@ struct ScanResults
 	std::string sample;
 	std::string lib;
 	std::string bam;
-	std::vector<int> telcounts;
-	std::vector<int> gccounts;
-	unsigned int numTotal;
-	unsigned int numMapped;
-	unsigned int numDuplicates;
+	std::vector<uint64_t> telcounts;
+	std::vector<uint64_t> gccounts;
+	uint64_t numTotal;
+	uint64_t numMapped;
+	uint64_t numDuplicates;
 	double telLenEstimate;
 
 	// logging data
-	unsigned int n_totalunfiltered = 0;
-	unsigned int n_exreadsExcluded = 0;
-	unsigned int n_exreadsChrUnmatched=0;
+	uint64_t n_totalunfiltered = 0;
+	uint64_t n_exreadsExcluded = 0;
+	uint64_t n_exreadsChrUnmatched=0;
 
 	ScanResults() { setDefaults(); }
 
     // Set reasonable default values for the qc filters
     void setDefaults()
     {
-		telcounts = std::vector<int>(ScanParameters::TEL_MOTIF_N,0);
-		gccounts = std::vector<int>(ScanParameters::GC_BIN_N,0);
+		telcounts = std::vector<uint64_t>(ScanParameters::TEL_MOTIF_N,0);
+		gccounts = std::vector<uint64_t>(ScanParameters::GC_BIN_N,0);
         numTotal = 0;
         numMapped = 0;
         numDuplicates = 0;
